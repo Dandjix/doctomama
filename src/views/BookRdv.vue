@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import CalendarComponent from '../components/CalendarComponent.vue';
+import CalendarComponent from '../components/CalendarBookApointment.vue';
 export default {
   name: 'Prendre Rendez-Vous',
   components: {
