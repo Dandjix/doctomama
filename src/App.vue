@@ -1,24 +1,40 @@
-<!-- src/App.vue -->
 <template>
-    <div id="app">
-      <nav>
-        <router-link to="/">Home</router-link>
-        <router-link to="/book-rdv">Book an Appointment</router-link>
-      </nav>
-      <router-view />
-    </div>
-  </template>
-  
-  <script>
-  export default {
-    name: 'App'
-  };
-  </script>
-  
-  <style>
-  /* Add your global styles here */
-  nav {
-    display: flex;
-    gap: 1rem;
+  <div id="app">
+    <!-- Pass isLoggedIn state to Navbar component -->
+    <Navbar :isLoggedIn="isLoggedIn" @logout="logout" />
+
+    <!-- Router view for rendering components based on routes -->
+    <router-view />
+  </div>
+</template>
+
+<script>
+import Navbar from './components/Navbar.vue';
+
+export default {
+  name: 'App',
+  components: {
+    Navbar
+  },
+  data() {
+    return {
+      isLoggedIn: false // Initially assuming user is not logged in
+    };
+  },
+  methods: {
+    login() {
+      // Simulate login logic
+      this.isLoggedIn = true;
+    },
+    logout() {
+      // Simulate logout logic
+      this.isLoggedIn = false;
+    }
   }
-  </style>
+};
+</script>
+
+<style>
+/* Add your global styles here */
+/* No changes needed in global styles for this example */
+</style>
