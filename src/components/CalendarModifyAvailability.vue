@@ -1,4 +1,5 @@
 <template>
+    <h1>modifier disponibilités</h1>
     <div>
       <vue-cal
         style="height: 600px"

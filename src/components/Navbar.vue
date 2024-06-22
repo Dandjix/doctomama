@@ -1,18 +1,19 @@
 <template>
-  <nav>
-    <div v-if="isLoggedIn">
-      <router-link to="/">Page d'accueil</router-link>
-      <router-link to="/availability">Modifier mes disponibilités </router-link>
-      <button @click="logout">Se déconnecter</button>
-    </div>
-    <div v-else-if="currentRoute === '/login'">
-      <router-link to="/">Page d'accueil</router-link>
-    </div>
-    <div v-else>
-      <router-link to="/">Page d'accueil</router-link>
-      <router-link to="/book-rdv">Prendre rendez-vous</router-link>
-    </div>
-  </nav>
+  <v-app-bar app>
+    <v-toolbar-title>
+      <router-link :to="isLoggedIn ? '/' : '/login'">Page d'accueil</router-link>
+    </v-toolbar-title>
+
+    <v-spacer></v-spacer>
+
+    <v-toolbar-items>
+      <v-btn v-if="isLoggedIn" @click="logout">Se déconnecter</v-btn>
+      <v-btn v-else-if="currentRoute === '/login'" to="/">Page d'accueil</v-btn>
+      <v-btn v-else to="/login">Se connecter</v-btn>
+      <v-btn to="/availability" v-if="isLoggedIn">Modifier mes disponibilités</v-btn>
+      <v-btn to="/book-rdv" v-else>Prendre rendez-vous</v-btn>
+    </v-toolbar-items>
+  </v-app-bar>
 </template>
   
 <script>

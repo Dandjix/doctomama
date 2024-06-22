@@ -1,4 +1,5 @@
 <template>
+    <h1>planifier mes vancances</h1>
     <div>
       <vue-cal
         style="height: 600px"

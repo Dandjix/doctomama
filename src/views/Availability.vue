@@ -1,9 +1,10 @@
 <template>
   <div>
     <div class="button-bar">
-      <button @click="selectedComponent = 'CalendarModifyAvailability'"><img src="" alt="Modifier mes disponibilités"></button>
-      <button @click="selectedComponent = 'CalendarWeekPlanning'"><img src="" alt="Modifier mon emploi du temps par semaine"></button>
-      <button @click="selectedComponent = 'CalendarPlanVacations'"><img src="" alt="Planifier mes vacances"></button>
+      <v-btn>button</v-btn>
+      <button @click="selectedComponent = 'CalendarModifyAvailability'"><img v-bind:src="require('/src/assets/disponibilites.png')" alt="Modifier mes disponibilités"></button>
+      <button @click="selectedComponent = 'CalendarWeekPlanning'"><img v-bind:src="require('/src/assets/edt.png')" alt="Modifier mon emploi du temps par semaine"></button>
+      <button @click="selectedComponent = 'CalendarPlanVacations'"><img v-bind:src="require('/src/assets/vacances.png')" alt="Planifier mes vacances"/></button>
     </div>
 
     <div class="component-display">
@@ -17,7 +18,7 @@
 
 import CalendarModifyAvailability from '../components/CalendarModifyAvailability.vue';
 import CalendarPlanVacations from '../components/CalendarPlanVacations.vue';
-import CalendarWeekPlanning from '../components/CalendarPlanVacations.vue';
+import CalendarWeekPlanning from '../components/CalendarWeekPlanning.vue';
 
 export default {
   name: 'PlannifierDisponibilites',
@@ -28,7 +29,7 @@ export default {
   },
   data() {
     return {
-      selectedComponent: 'CalendarComponent' // Default component to display
+      selectedComponent: 'CalendarModifyAvailability' // Default component to display
     };
   }
 };

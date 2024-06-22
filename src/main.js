@@ -1,15 +1,14 @@
-import { createApp } from 'vue';
-import App from './App.vue';
-import router from './router'; // Assuming you have a router setup
-import store from './store'; // Assuming you have a Vuex store setup
+import { createApp } from 'vue'
+import App from './App.vue'
+import router from './router'
+import vuetify from './plugins/vuetify'
+import { loadFonts } from './plugins/webfontloader'
+import store from './store'
 
-const app = createApp(App);
+loadFonts()
 
-// Register plugins
-app.use(router);
-app.use(store);
-
-// Mount the app
-app.mount('#app');
-
-store.dispatch('tryLoadingSessionCookie');
+createApp(App)
+  .use(router)
+  .use(vuetify)
+  .use(store)
+  .mount('#app')
