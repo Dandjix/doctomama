@@ -1,17 +1,27 @@
 <template>
   <v-app-bar app>
     <v-toolbar-title>
-      <router-link :to="isLoggedIn ? '/' : '/login'">Page d'accueil</router-link>
+      <router-link to="/">Page d'accueil</router-link>
     </v-toolbar-title>
 
     <v-spacer></v-spacer>
 
     <v-toolbar-items>
-      <v-btn v-if="isLoggedIn" @click="logout">Se déconnecter</v-btn>
-      <v-btn v-else-if="currentRoute === '/login'" to="/">Page d'accueil</v-btn>
-      <v-btn v-else to="/login">Se connecter</v-btn>
-      <v-btn to="/availability" v-if="isLoggedIn">Modifier mes disponibilités</v-btn>
-      <v-btn to="/book-rdv" v-else>Prendre rendez-vous</v-btn>
+      
+      <template v-if="isLoggedIn">
+        <v-btn to="/availability">Modifier mes disponibilités</v-btn>
+        <v-btn @click="logout">Se déconnecter</v-btn>
+      </template>
+      <template v-else-if="currentRoute === '/login'">
+
+      </template>
+      <template v-else>
+        <v-btn to="/book-rdv">Prendre rendez-vous</v-btn>
+      </template>
+
+
+
+
     </v-toolbar-items>
   </v-app-bar>
 </template>
