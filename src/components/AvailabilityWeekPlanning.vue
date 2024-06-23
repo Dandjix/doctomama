@@ -2,15 +2,20 @@
     <h1>Planning hebdomadaire</h1>
     <div>
       <vue-cal
-        style="height: 600px"
         :events="events"
-        @event-click="onEventClick"
-        @cell-click="onCellClick"
-        class="custom-calendar"
+        class="week-planning-calendar vuecal--full-height-delete"
         :locale="fr"
-      />
+        :first-day="0"   
+        :disable-views="['years', 'year', 'month', 'day']" 
+        hide-view-selector
+        hide-title-bar 
+        :show-date="true"
+        :editable-events="{ title: false, drag: false, resize: true, delete: true, create: true }" 
+        :drag-to-create-threshold="0"
+        />
     </div>
-  </template>
+
+</template>
   
   <script>
   import VueCal from 'vue-cal';
@@ -41,28 +46,34 @@
     data() {
       return {
         events: [],
-        fr
+        fr,
       };
     },
     methods: {
-      onEventClick(event) {
-        alert(`Vous avez cliqué sur l'événement : ${event.title}, qui commence à ${event.start}`);
-      },
-      onCellClick(date) {
-        const title = prompt('Entrez le titre du rendez-vous :');
-        //if (title) {
-          // Calculate end time as 1 hour after start time
-          const endTime = new Date(date);
-          endTime.setHours(endTime.getHours() + 1);
-  
-          this.events.push({
-            class: 'apointment',
-            start: date,
-            end: endTime,
-            title
-          });
-        //}
-      }
+      // onEventClick(event) {
+      //   alert(`Vous avez cliqué sur l'événement : ${event.title}, qui commence à ${event.start}`);
+      //   showPopupAt(event)
+      // },
     }
   };
   </script>
+
+<style>
+  /* this doesnt work for some reason */
+  .week-planning-calendar .vuecal__arrow--next,
+  .week-planning-calendar .vuecal__arrow--prev {
+    display: none !important;
+  }
+
+  .week-planning-calendar  .vuecal__event {
+    background-color: green;
+    color: white;
+  }
+
+  .week-planning-calendar {
+    height: 500px;
+  }
+  /* .vuecal + .vuecal .vuecal__arrow {display: none;} */
+</style>
+
+  
