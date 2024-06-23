@@ -1,25 +1,32 @@
 <template>
     <h1>Planning hebdomadaire</h1>
-    <div>
-      <vue-cal
-        :events="events"
-        class="week-planning-calendar vuecal--full-height-delete"
-        :locale="fr"
-        :first-day="0"   
-        :disable-views="['years', 'year', 'month', 'day']" 
-        hide-view-selector
-        hide-title-bar 
-        :show-date="true"
-        :editable-events="{ title: false, drag: false, resize: true, delete: true, create: true }" 
-        :drag-to-create-threshold="0"
-        />
-    </div>
+    <v-col>
+      <v-row>
+        <vue-cal
+          :events="events"
+          class="week-planning-calendar vuecal--full-height-delete"
+          :locale="fr"
+          :first-day="0"   
+          :disable-views="['years', 'year', 'month', 'day']" 
+          hide-view-selector
+          hide-title-bar 
+          :show-date="true"
+          :editable-events="{ title: false, drag: false, resize: true, delete: true, create: true }" 
+          :drag-to-create-threshold="0"
+
+          :time-from="8 * 60"
+          :time-to="19 * 60"
+          :time-step="60"
+          />
+      </v-row>
+    </v-col>
 
 </template>
   
   <script>
   import VueCal from 'vue-cal';
   import 'vue-cal/dist/vuecal.css';
+  import StepSelector from '.'
   
   const fr = {
     "weekDays": ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"],
@@ -47,6 +54,7 @@
       return {
         events: [],
         fr,
+        time_step:60
       };
     },
     methods: {

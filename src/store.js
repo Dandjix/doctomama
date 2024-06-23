@@ -6,12 +6,14 @@ export default new Vuex.Store({
   state: {
     session: Cookies.get('session') || '',
     isLoggedIn: !!Cookies.get('session'),
+    heure_debut_calendrier:"00:00",
+    heure_fin_calendrier:"00:00"
   },
   mutations: {
     setSession(state, session) {
       state.session = session;
       state.isLoggedIn = true;
-      Cookies.set('session', session); // Set cookie
+      Cookies.set('session', session,'3h'); // Set cookie
     },
     clearSession(state) {
       state.session = '';

@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const BASE_URL = 'http://localhost:3000';
+import BASE_URL from './BASE_URL'
 
 // Function to fetch planning data
 const login = async (hashed_password) => {

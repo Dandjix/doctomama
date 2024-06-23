@@ -33,7 +33,6 @@
           <img v-bind:src="require('/src/assets/settings.png')" alt="Options" class="button-image_image"/>
         </v-btn> 
 
-        <v-spacer/>
     </v-toolbar-items>
   </v-app-bar>
     <div class="component-display">
