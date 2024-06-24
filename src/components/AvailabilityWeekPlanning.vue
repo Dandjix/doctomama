@@ -2,8 +2,13 @@
   <h1>Planning hebdomadaire</h1>
   <v-col>
     <v-row>
+      <stepSelector v-model="time_step"></stepSelector>
+    </v-row>
+    <v-row>
       <vue-cal
-        :events="events"
+        ref="vueCal"
+
+        v-model:events="events"
 
         class="week-planning-calendar vuecal--full-height-delete"
         :locale="fr"
@@ -27,14 +32,25 @@
         :dragToCreateEvent="true"
         :show-day-numbers="false"
 
-        :on-event-click="onEventClicked"
-        :on-event-create="onEventCreated"
+        @event-click="eventClicked"
+        @event-duration-change="eventDurationChanged"
         />
 
     </v-row>
+    <v-row>
+      <v-spacer/>
+      <v-btn color="red" @click="reset">Réinitialiser</v-btn>
+      <v-spacer/>
+    </v-row>
   </v-col>
 
-  <modifyDialog :open="dialogVisible" @close="dialogVisible = false" :calendarEvent="selectedEvent"/>
+  <modifyDialog :open="dialogVisible" 
+  @close="dialogVisible = false" 
+  :calendarEvent="selectedEvent"
+  :minTime="heure_debut"
+  :maxTime="heure_fin"
+  @update-calendar-event="updateCalendarEvent"
+  />
 
   
 
@@ -42,9 +58,12 @@
   
   <script>
   import VueCal from 'vue-cal';
-  import modifyDialog from './AvailabilityWeekPlanningModifyDialog'
   import 'vue-cal/dist/vuecal.css';
   import SettingsService from '../services/SettingsService';
+
+  import modifyDialog from './AvailabilityWeekPlanningModifyDialog'
+  import stepSelector from './TimeStepSelector.vue'
+
 
   const fr = {
     "weekDays": ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"],
@@ -67,11 +86,13 @@
     name: 'CalendarComponent',
     components: {
       VueCal,
-      modifyDialog
+      modifyDialog,
+      stepSelector
     },
     data() {
       return {
         events: [],
+        events_2_electric_boogaloo: [],
         fr,
         time_step:1,
         dialogVisible:false,
@@ -86,18 +107,49 @@
 
     },
     methods: {
-      onEventCreated(event)
+      eventCreated(event)
       {
-        this.events.push(event)
-
+        // this.events.push(event)
+        // console.log("deleter : "+JSON.stringify(deleteEventFunction));
+        // deleteEventFunction()
         return event
+        // return false
       },
-      onEventClicked(event)
+      eventClicked(event)
       {
         // console.log("event : "+JSON.stringify(event));
         this.dialogVisible = true
         this.selectedEvent = event
       },
+      eventChanged(req)
+      {
+        const event = req.event;
+
+        const event_id = this.events_2_electric_boogaloo.findIndex(arrayEvent =>{
+          return arrayEvent._eid == event._eid;
+        });
+        if(event_id<=-1)
+        {
+          this.events_2_electric_boogaloo.push(event)
+          return
+        }
+        this.events_2_electric_boogaloo[event_id] = event
+      },
+      eventDeleted(event){
+        const index = this.events_2_electric_boogaloo.find(arrayEvent => {
+          arrayEvent._eid==event._eid
+        })
+        if(index<=-1)
+        {
+          throw new Error("impossible de trouver cet évenement!")
+        }
+        this.events_2_electric_boogaloo.splice(index,1)
+      },
+      applyEvents()
+      {
+        this.events = [...this.events_2_electric_boogaloo]
+      }
+      ,
       async loadSettings(){
         this.heure_debut = await SettingsService.getSetting("heure_debut_calendrier")
         this.heure_fin = await SettingsService.getSetting("heure_fin_calendrier")
@@ -114,12 +166,63 @@
                 spans[3].style.display = 'none';
             }
         });
-      }
+      },
+      updateCalendarEvent(originalEvent, updatedEvent) {
+        // console.log("updated event from : " + JSON.stringify(originalEvent) + " to : " + JSON.stringify(updatedEvent));
+        // Find the index of the original event in the list
+        const eventIndex = this.events.findIndex(event => {
+          // console.log("event start : "+event.start);
+          // console.log("event end : "+event.end);
+          // console.log();
+          return event.start === originalEvent.start && event.end === originalEvent.end
+        }
+
+        );
+
+        // console.log("original event start : "+originalEvent.start);
+        // console.log("original event end : "+originalEvent.end);
+        // console.log();
+
+        // If the event is found, replace it with the updated event
+        if (eventIndex !== -1) {
+            // const newEvents = [...this.events]
+            this.events_2_electric_boogaloo[eventIndex] = updatedEvent;
+            // this.events = newEvents;
+            // this.events = this.events
+            // this.events.slice(eventIndex,1)
+            console.log("Event updated successfully.");
+        } else {
+            console.log("Event not found.");
+        }
+        this.applyEvents()
+        // console.log("events : " + JSON.stringify(this.events));
+    },
+    reset(){
+      // this.getAllEvents()
+      console.log("events var : "+JSON.stringify(this.events_2_electric_boogaloo));
+    },
+    getAllEvents() {
+      const allEvents = this.$refs.vueCal.events;
+      console.log(allEvents);
+      alert(JSON.stringify(allEvents));
+    },
+    // eventDurationChanged(result){
+    //   // console.log("result : "+JSON.stringify(result));
+    // }
     }
     ,async mounted()
     {
-        await this.loadSettings()
-        this.hideDayNumbers()
+      if(this.$refs.vueCal)
+      {
+        console.log("vuecal can be gotten");
+      }
+      else
+      {
+        console.log("not fine");
+        console.log(JSON.stringify(this.$refs));
+      }
+      await this.loadSettings()
+      this.hideDayNumbers()
     },
   };
 

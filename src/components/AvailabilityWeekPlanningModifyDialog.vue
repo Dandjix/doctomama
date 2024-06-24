@@ -1,6 +1,6 @@
 <template>
 <v-dialog v-model="dialogVisible" @afterLeave="closeDialog" max-width="800" >
-    <v-card>
+    <v-card class="card">
         <v-col>
             <v-row>
                 <v-spacer/>
@@ -8,16 +8,15 @@
                 <v-spacer/>
             </v-row>
             <v-row>
-                <v-time-picker format="24hr" no-header v-model="startTime"/>
+                <v-time-picker format="24hr" no-title title="Heure de début de la plage horaire" v-model="startTime" :min="minTime" :max="endTime"   />
                 <v-spacer/>
-                <v-time-picker format="24hr" no-header v-model="endTime"/>
+                <v-time-picker format="24hr" no-title title="Heure de fin de la plage horaire" v-model="endTime" :min="startTime" :max="maxTime"/>
             </v-row>
             <v-row>
                 <v-spacer/>
-                <v-btn @click="save">Enregistrer</v-btn>
+                <v-btn @click="save" color="primary">Enregistrer</v-btn>
                 <v-spacer/>
             </v-row>
-
         </v-col>
 
     </v-card>
@@ -40,6 +39,14 @@
       calendarEvent: {
         type: Object,
         default: null
+      },
+      minTime:{
+        type: String,
+        default:"08:00"
+      },
+      maxTime:{
+        type: String,
+        default:"18:00"
       }
     },
     data() {
@@ -62,7 +69,32 @@
         this.$emit('close'); // Emit close calendarEvent to notify parent
       },
       save(){
-        // console.log(JSON.stringify(this.calendarEvent));
+
+        const [startHours, startMinutes] = this.startTime.split(':').map(Number);
+        const [endHours, endMinutes] = this.endTime.split(':').map(Number);
+
+
+        const updatedCalendarEvent = { ...this.calendarEvent };
+
+        const updatedStart = new Date(updatedCalendarEvent.start);
+        updatedStart.setHours(startHours);
+        updatedStart.setMinutes(startMinutes);
+        
+        const updatedEnd = new Date(updatedCalendarEvent.end);
+        updatedEnd.setHours(endHours);
+        updatedEnd.setMinutes(endMinutes);
+
+
+        updatedCalendarEvent.start = updatedStart;
+        updatedCalendarEvent.end = updatedEnd;
+        updatedCalendarEvent.startTimeMinutes = startHours*60+startMinutes;
+        updatedCalendarEvent.endTimeMinutes = endHours*60+endMinutes;
+
+
+        // console.log("updated end : " + updatedCalendarEvent.end);
+
+        this.$emit('update-calendar-event', this.calendarEvent,updatedCalendarEvent);
+
         this.closeDialog();
       }
     }
@@ -75,7 +107,7 @@
 
   function getEndTime(event)
   {
-    console.log("event : "+JSON.stringify(event)+", end : "+event.end);
+    // console.log("event : "+JSON.stringify(event)+", end : "+event.end);
     return getTime(event.end);
   }
 
@@ -88,7 +120,7 @@
 
     const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
 
-    console.log("dateTime : "+dateTime+", obj : "+JSON.stringify(dateObj));
+    // console.log("dateTime : "+dateTime+", obj : "+JSON.stringify(dateObj));
 
     return timeString;
   }
@@ -96,6 +128,10 @@
   </script>
   
   <style scoped>
+    .card{
+      padding:25px;
+    }
+
     .dialog-center {
         display: flex;
         justify-content: center;
