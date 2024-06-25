@@ -71,7 +71,8 @@
   import VueCal from 'vue-cal';
   import 'vue-cal/dist/vuecal.css';
   import SettingsService from '../services/SettingsService';
-
+  import WeekPlanningService from '@/services/WeekPlanningService';
+  import {mapState} from 'vuex'
   import modifyDialog from './AvailabilityWeekPlanningModifyDialog'
   // import stepSelector from './TimeStepSelector.vue'
 
@@ -116,7 +117,7 @@
       };
     },
     computed:{
-
+      ...mapState(['session'])
     },
     methods: {
       eventClicked(event)
@@ -143,11 +144,15 @@
         this.mergeOverlapping(event)
         this.formatEvents()
       },
-      async loadSettings(){
+      async load(){
         this.heure_debut = await SettingsService.getSetting("heure_debut_calendrier")
         this.heure_fin = await SettingsService.getSetting("heure_fin_calendrier")
         this.minutes_debut = getMinutes(this.heure_debut)
-        this.minutes_fin = getMinutes(this.heure_fin)     
+        this.minutes_fin = getMinutes(this.heure_fin)
+        console.log("session : "+this.session);
+        this.events = await WeekPlanningService.getPlagesHoraires(this.session)
+
+
         this.loading = false
       }
       ,hideDayNumbers(){
@@ -189,10 +194,11 @@
       this.sending = false
     },
     reset(){
+      console.log(JSON.stringify(this.events));
       this.events = []
     },
     formatEvents() {
-      console.log("formatting events");
+      // console.log("formatting events");
       for (let i = 0; i < this.events.length; i++) {
         const event = this.events[i];
         const startHour = `${event.start.getHours()}:${event.start.getMinutes()}`
@@ -285,7 +291,7 @@
     }
     ,async mounted()
     {
-      await this.loadSettings()
+      await this.load()
       this.hideDayNumbers()
     },
   };
