@@ -53,6 +53,18 @@
       <v-spacer/>
       <v-spacer/>
     </v-row>
+    <v-row style="padding: 50px;">
+      <v-spacer></v-spacer>
+      <v-card>
+        <v-card-title>Mode d'emploi</v-card-title>
+        <v-card-text>
+          Définissez votre emploi du temps, qui sera appliqué à chaque nouvelle semaine au fil du temps (définissez la longueur de votre calendrier dans les options).
+          <br>
+          Vous pouvez aussi appliquer cet emploi du temps à plusieurs semaines via la page modifier disponibilités (icone horloge).
+        </v-card-text>
+      </v-card>
+      <v-spacer></v-spacer>
+    </v-row>
   </v-col>
 
   <modifyDialog :open="dialogVisible" 
@@ -149,7 +161,7 @@
         this.heure_fin = await SettingsService.getSetting("heure_fin_calendrier")
         this.minutes_debut = getMinutes(this.heure_debut)
         this.minutes_fin = getMinutes(this.heure_fin)
-        console.log("session : "+this.session);
+        // console.log("session : "+this.session);
         this.events = await WeekPlanningService.getPlagesHoraires(this.session)
 
 
@@ -190,6 +202,7 @@
     },
     async save(){
       this.sending = true
+      await WeekPlanningService.setPlagesHoraires(this.session,this.events)
       // await new Promise(resolve => setTimeout(resolve, 1000));
       this.sending = false
     },

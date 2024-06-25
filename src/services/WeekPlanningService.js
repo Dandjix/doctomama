@@ -48,7 +48,21 @@ function toPlages(events)
 {
     console.log(JSON.stringify(events));
     let plages = []
-
+    for (let i = 0; i < events.length; i++) {
+      const event = events[i];
+      const day = event.start.getDate() - 5
+      const h_d = `${event.start.getHours()}:${event.start.getMinutes()}`
+      const h_f = `${event.end.getHours()}:${event.end.getMinutes()}`
+     
+      let plage = 
+      {
+        "day":day,
+        "start_time":h_d,
+        "end_time":h_f
+      }
+      plages.push(plage)
+    }
+    // console.log("plages : "+JSON.stringify(plages));
     return plages
 }
 

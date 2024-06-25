@@ -36,7 +36,7 @@ export default new Vuex.Store({
     },
     async logout({ commit, state }) {
       try {
-        console.log("about to logout");
+        // console.log("about to logout");
         const session = state.session
         await LoginService.logout(session)
         commit('clearSession');
