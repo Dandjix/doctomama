@@ -8,13 +8,32 @@
                 <v-spacer/>
             </v-row>
             <v-row>
-                <v-time-picker format="24hr" no-title title="Heure de début de la plage horaire" v-model="startTime" :min="minTime" :max="endTime"   />
+                <v-time-picker 
+                format="24hr" 
+                title="Heure de début de la plage horaire" 
+                v-model="startTime" 
+                :min="minTime" 
+                :max="endTime"
+                @update:hour="changeStartHour"
+                   />
                 <v-spacer/>
-                <v-time-picker format="24hr" no-title title="Heure de fin de la plage horaire" v-model="endTime" :min="startTime" :max="maxTime"/>
+                <v-time-picker format="24hr" 
+                title="Heure de fin de la plage horaire" 
+                v-model="endTime" 
+                :min="startTime" 
+                :max="maxTime"
+                @update:hour="changeEndHour"
+                />
             </v-row>
             <v-row>
                 <v-spacer/>
+                <v-spacer/>
+                <v-spacer/>
+                <v-btn @click="deleteEvent" color="red">Supprimer</v-btn>
+                <v-spacer/>
                 <v-btn @click="save" color="primary">Enregistrer</v-btn>
+                <v-spacer/>
+                <v-spacer/>
                 <v-spacer/>
             </v-row>
         </v-col>
@@ -84,11 +103,13 @@
         updatedEnd.setHours(endHours);
         updatedEnd.setMinutes(endMinutes);
 
+        // console.log(`from ${startHours}:${startMinutes} to ${endHours}:${endMinutes}`);
+
 
         updatedCalendarEvent.start = updatedStart;
         updatedCalendarEvent.end = updatedEnd;
-        updatedCalendarEvent.startTimeMinutes = startHours*60+startMinutes;
-        updatedCalendarEvent.endTimeMinutes = endHours*60+endMinutes;
+        // updatedCalendarEvent.startTimeMinutes = startHours*60+startMinutes;
+        // updatedCalendarEvent.endTimeMinutes = endHours*60+endMinutes;
 
 
         // console.log("updated end : " + updatedCalendarEvent.end);
@@ -96,8 +117,20 @@
         this.$emit('update-calendar-event', this.calendarEvent,updatedCalendarEvent);
 
         this.closeDialog();
-      }
-    }
+      },
+      deleteEvent(){
+        this.$emit('update-calendar-event', this.calendarEvent,null);
+        this.closeDialog();
+      },
+      changeStartHour(hour){
+        const minutes = this.startTime.split(":")[1];
+        this.startTime=`${hour}:${minutes}`
+      },
+      changeEndHour(hour){
+          const minutes = this.endTime.split(":")[1];
+          this.endTime=`${hour}:${minutes}`
+      },
+    },
   };
 
   function getStartTime(event)
