@@ -46,7 +46,7 @@ function createOriginalDate(dayIndex,time)
 
 function toPlages(events)
 {
-    console.log(JSON.stringify(events));
+    // console.log(JSON.stringify(events));
     let plages = []
     for (let i = 0; i < events.length; i++) {
       const event = events[i];
