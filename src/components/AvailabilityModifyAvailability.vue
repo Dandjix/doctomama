@@ -1,24 +1,76 @@
 <template>
-    <h1>modifier disponibilités</h1>
-    <div>
+  <h1>Disponibilites</h1>
+  <v-col>
+    <!-- <v-row>
+      <stepSelector v-model="time_step"></stepSelector>
+    </v-row> -->
+    <v-row>
       <vue-cal
-        style="height: 600px"
-        :events="events"
-        @event-click="onEventClick"
-        @cell-click="onCellClick"
-        class="custom-calendar"
+        ref="vueCal"
+
+        v-model:events="events"
+
+        class="availability-calendar vuecal--full-height-delete"
         :locale="fr"
-      />
-    </div>
-  </template>
+
+
+        :time-from="minutes_debut"
+        :time-to="minutes_fin"
+
+        :time-step="60"
+        :overlaps-per-time-step="true"
+
+        :editable-events="{ title: false, drag: false, resize: false, delete: false, create: false }" 
+        :dragToCreateEvent="false"
+        :show-day-numbers="false"
+
+        :disabled="sending||loading"
+
+        :min-date="minDate"
+        :max-date="maxDate"
+
+        @event-click="eventClicked"
+        @cell-click="cellClicked"
+        />
+
+    </v-row>
+    <v-row>
+      <v-spacer/>
+      <v-progress-circular v-if="sending" class="spinner" indeterminate :size="30"></v-progress-circular>
+      <v-spacer/>
+    </v-row>
+    <v-row>
+      <v-spacer/>
+      <v-btn color="primary" :disabled="sending||loading" @click="save">Sauvegarder</v-btn>
+      <v-spacer/>
+    </v-row>
+  </v-col>
+
+  <modifyDialog :open="dialogVisible" 
+  @close="dialogVisible = false" 
+  :calendarEvent="selectedEvent"
+  :minTime="heure_debut"
+  :maxTime="heure_fin"
+  @update-calendar-event="updateCalendarEvent"
+  />
+
+  
+
+</template>
   
   <script>
   import VueCal from 'vue-cal';
   import 'vue-cal/dist/vuecal.css';
-  
+  import SettingsService from '../services/SettingsService';
+  // import WeekPlanningService from '@/services/WeekPlanningService';
+  import {mapState} from 'vuex'
+  import modifyDialog from './AvailabilityWeekPlanningModifyDialog'
+  // import stepSelector from './TimeStepSelector.vue'
+
+
   const fr = {
-    "weekDays": ["1er lundi", "2e mardi", "3e mercredi", "4e jeudi", "5e vendredi", "6e samedi", "7e dimanche"],
-    "weekDaysShort": ["lun", "mar", "mer", "jeu", "ven", "sam", "dim"],
+    "weekDays": ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"],
+    "weekDaysShort": ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
     "months": ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"],
     "years": "Années",
     "year": "Année",
@@ -26,7 +78,7 @@
     "week": "Semaine",
     "day": "Jour",
     "today": "Aujourd'hui",
-    "noEvent": "Aucun événement",
+    "noEvent": "",
     "allDay": "Toute la journée",
     "deleteEvent": "Supprimer",
     "createEvent": "Créer un événement",
@@ -36,33 +88,259 @@
   export default {
     name: 'CalendarComponent',
     components: {
-      VueCal
+      VueCal,
+      modifyDialog,
+      // stepSelector
     },
     data() {
       return {
-        events: [],
-        fr
+        events: [],//loaded from mounted
+        fr,
+        time_step:1,
+        dialogVisible:false,
+        selectedEvent:{},
+        heure_debut:"8:00",//loaded from mounted
+        heure_fin:"18:00",//loaded from mounted
+        minutes_debut:480,
+        minutes_fin:1080,
+        loading:true,
+        sending:false,
+        minDate:new Date(),
+        maxDate:new Date(),
       };
     },
+    computed:{
+      ...mapState(['session'])
+    },
     methods: {
-      onEventClick(event) {
-        alert(`Vous avez cliqué sur l'événement : ${event.title}, qui commence à ${event.start}`);
+      eventClicked(event)
+      {
+        if(this.sending||this.loading)
+          return
+        // console.log("event : "+JSON.stringify(event));
+        this.dialogVisible = true
+        this.selectedEvent = event
       },
-      onCellClick(date) {
-        const title = prompt('Entrez le titre du rendez-vous :');
-        //if (title) {
-          // Calculate end time as 1 hour after start time
-          const endTime = new Date(date);
-          endTime.setHours(endTime.getHours() + 1);
-  
-          this.events.push({
-            class: 'apointment',
-            start: date,
-            end: endTime,
-            title
-          });
-        //}
+      cellClicked(date)
+      {
+        if(!(date instanceof Date))
+        {
+          // console.log("you clicked something else than a date mate");
+          return
+        }
+        if(this.sending||this.loading)
+          return
+        const endTime = new Date(date);
+        endTime.setHours(endTime.getHours() + 1);
+
+        const event = {
+          class: 'apointment',
+          start: date,
+          end: endTime,
+        }
+        this.events.push(event);
+        this.mergeOverlapping(event)
+        this.formatEvents()
+      },
+      async load(){
+        this.heure_debut = await SettingsService.getSetting("heure_debut_calendrier")
+        this.heure_fin = await SettingsService.getSetting("heure_fin_calendrier")
+        this.minutes_debut = getMinutes(this.heure_debut)
+        this.minutes_fin = getMinutes(this.heure_fin)
+
+        this.minDate = new Date()
+        const nbDays = await SettingsService.getSetting("duree_planification");
+
+        const maxDate = new Date();
+        maxDate.setDate(maxDate.getDate() + nbDays);
+        this.maxDate = maxDate;
+
+        // console.log(`nbDays : ${nbDays}, maxDate : ${JSON.stringify(maxDate)}`);
+        // console.log("session : "+this.session);
+        // this.events = await WeekPlanningService.getPlagesHoraires(this.session)
+
+
+        this.loading = false
+      },
+      updateCalendarEvent(originalEvent, updatedEvent) {
+        // console.log("original event : "+JSON.stringify(originalEvent));
+        const eventIndex = this.events.findIndex(arrayEvent => {
+          return arrayEvent.start === originalEvent.start && arrayEvent.end === originalEvent.end
+        }
+        );
+
+        if (eventIndex !== -1) {
+            if(updatedEvent==null)
+            {
+              this.events.splice(eventIndex,1)
+            }
+            else
+            {
+              this.events[eventIndex] = updatedEvent;
+              this.mergeOverlapping(updatedEvent)
+            }
+            this.formatEvents()
+        } else {
+            // console.log("Event not found.");
+        }
+
+    },
+    async save(){
+      this.sending = true
+      // await WeekPlanningService.setPlagesHoraires(this.session,this.events)
+      // await new Promise(resolve => setTimeout(resolve, 1000));
+      this.sending = false
+    },
+    reset(){
+      console.log(JSON.stringify(this.events));
+      this.events = []
+    },
+    formatEvents() {
+      // console.log("formatting events");
+      for (let i = 0; i < this.events.length; i++) {
+        const event = this.events[i];
+        const startHour = `${event.start.getHours()}:${event.start.getMinutes()}`
+        const endHour = `${event.end.getHours()}:${event.end.getMinutes()}`
+        if(compareHours(startHour,this.heure_debut)){
+          event.start = getCopiedDateWithTime(event.start,this.heure_debut)
+        }
+
+        if(compareHours(this.heure_fin,endHour)){
+          event.end = getCopiedDateWithTime(event.end,this.heure_fin)
+        }
+
+      }
+    },
+    deleteNonUniques()
+    {
+      let uniqueEvents = [];
+      let encounteredEvents = new Set();
+
+      // Iterate through each event
+      for (let event of this.events) {
+          // Create a unique key based on start and end times
+          let key = `${event.start}-${event.end}`;
+
+          // Check if this key has been encountered before
+          if (!encounteredEvents.has(key)) {
+              // If not encountered, add the event to uniqueEvents
+              uniqueEvents.push(event);
+
+              // Mark this key as encountered
+              encounteredEvents.add(key);
+          }
+          // If the key has been encountered, skip adding this event
+      }
+
+      // Now uniqueEvents array contains only unique events
+      this.events = uniqueEvents;
+    },
+    mergeOverlapping(event)
+    {
+      this.deleteNonUniques()
+      const otherOverlapping = this.getOverlapping(event)
+
+      let start = event.start
+      let end = event.end
+
+      for (let i = 0; i < otherOverlapping.length; i++) {
+        const element = otherOverlapping[i];
+        if(element.start<start)
+          start = element.start
+        if(element.end>end)
+          end = element.end
+        this.delete(element)
+      }
+      event.start = start
+      event.end = end
+    },
+    getOverlapping(event)
+    {
+      let overlapping = []
+      for (let i = 0; i < this.events.length; i++) {
+        const otherEvent = this.events[i];
+        const isThis = otherEvent.start==event.start && otherEvent.end == event.end;
+        if(isThis)
+          continue
+        // if(otherEvent.start)
+        // console.log("date : "+otherEvent.start+"type : "+typeof otherEvent.start)
+        const areOverlapping = (event.start <= otherEvent.start && otherEvent.start <= event.end) ||
+                    (event.start <= otherEvent.end && otherEvent.end <= event.end);
+        if(areOverlapping)
+          overlapping.push(otherEvent)
+        // console.log("comp : "+overlapping);
+        // overlapping
+
+        // console.log("element is this event ? : "+isThis);
+      }
+      return overlapping
+    },
+    delete(event)
+    {
+      for (let i = 0; i < this.events.length; i++) {
+        const arrayEvent = this.events[i];
+        if(arrayEvent.start==event.start && arrayEvent.end == event.end)
+        {
+          this.events.splice(i,1);
+          return
+        }
       }
     }
+    }
+    ,async mounted()
+    {
+      await this.load()
+    },
   };
+
+  function getMinutes(time)
+  {
+    let [h,m] = time.split(":")
+    h = parseInt(h)
+    m = parseInt(m)
+
+    return 60*h+m;
+  }
+  function getCopiedDateWithTime(date,time)
+  {
+    //copy the date
+    const copiedDate = new Date(date);
+    const [hours,minutes] = time.split(':')
+    copiedDate.setHours(hours,minutes)
+
+    return copiedDate
+  }
+  function compareHours(begin,end)
+  {
+    let [hourB,minB] = begin.split(":")
+    let [hourE,minE] = end.split(":")
+    hourB = parseInt(hourB)
+    minB = parseInt(minB)
+    hourE = parseInt(hourE)
+    minE = parseInt(minE)
+
+    if(hourB<hourE){
+      return true
+    }
+    if(hourB>hourE){
+      return false
+    }
+    return minB<minE
+  }
+
+
   </script>
+
+<style>
+  .availability-calendar  .vuecal__event {
+    background-color: green;
+    color: white;
+  }
+
+  .availability-calendar {
+    height: 500px;
+  }
+  /* .vuecal + .vuecal .vuecal__arrow {display: none;} */
+</style>
+
+  

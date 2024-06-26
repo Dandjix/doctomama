@@ -1,9 +1,9 @@
 <template>
   <h1>Planning hebdomadaire</h1>
   <v-col>
-    <!-- <v-row>
-      <stepSelector v-model="time_step"></stepSelector>
-    </v-row> -->
+    <v-row>
+      <stepSelector v-if="false" v-model="time_step" style=""></stepSelector>
+    </v-row>
     <v-row>
       <vue-cal
         ref="vueCal"
@@ -28,7 +28,7 @@
         :time-step="60"
         :overlaps-per-time-step="true"
 
-        :editable-events="{ title: false, drag: false, resize: false, delete: false, create: false }" 
+        :editable-events="{ title: false, drag: true, resize: true, delete: true, create: false }" 
         :dragToCreateEvent="false"
         :show-day-numbers="false"
 
@@ -36,6 +36,9 @@
 
         @event-click="eventClicked"
         @cell-click="cellClicked"
+        @event-change="eventChanged"
+        @event-duration-change="eventDurationChanged"
+        @event-delete="eventDeleted"
         />
 
     </v-row>
@@ -53,6 +56,13 @@
       <v-spacer/>
       <v-spacer/>
     </v-row>
+
+    <v-row>
+      <v-spacer/>
+      <applyPatern :minDate="minDate" :maxDate="maxDate"></applyPatern>
+      <v-spacer/>
+    </v-row>
+
     <v-row style="padding: 50px;">
       <v-spacer></v-spacer>
       <v-card>
@@ -65,6 +75,7 @@
       </v-card>
       <v-spacer></v-spacer>
     </v-row>
+
   </v-col>
 
   <modifyDialog :open="dialogVisible" 
@@ -86,7 +97,8 @@
   import WeekPlanningService from '@/services/WeekPlanningService';
   import {mapState} from 'vuex'
   import modifyDialog from './AvailabilityWeekPlanningModifyDialog'
-  // import stepSelector from './TimeStepSelector.vue'
+  import applyPatern from './AvailabilityWeekPlanningApply.vue'
+  import stepSelector from './TimeStepSelector.vue'
 
 
   const fr = {
@@ -111,7 +123,8 @@
     components: {
       VueCal,
       modifyDialog,
-      // stepSelector
+      applyPatern,
+      stepSelector
     },
     data() {
       return {
@@ -125,7 +138,9 @@
         minutes_debut:480,
         minutes_fin:1080,
         loading:true,
-        sending:false
+        sending:false,
+        minDate:new Date(),
+        maxDate:new Date()
       };
     },
     computed:{
@@ -142,6 +157,11 @@
       },
       cellClicked(date)
       {
+        if(!(date instanceof Date))
+        {
+          // console.log("you clicked something else than a date mate");
+          return
+        }
         if(this.sending||this.loading)
           return
         const endTime = new Date(date);
@@ -164,6 +184,13 @@
         // console.log("session : "+this.session);
         this.events = await WeekPlanningService.getPlagesHoraires(this.session)
 
+        this.minDate = new Date()
+        const nbDays = await SettingsService.getSetting("duree_planification")
+
+        const maxDate = new Date();
+        maxDate.setDate(maxDate.getDate() + nbDays);
+        
+        this.maxDate = maxDate
 
         this.loading = false
       }
@@ -177,28 +204,79 @@
             }
         });
       },
-      updateCalendarEvent(originalEvent, updatedEvent) {
+      eventChanged(req){
+        let originalEvent = req.originalEvent;
+        let updatedEvent = req.event;
+
+        // updatedEvent = this.getSteppedEvent(updatedEvent)
+
         // console.log("original event : "+JSON.stringify(originalEvent));
         const eventIndex = this.events.findIndex(arrayEvent => {
-          return arrayEvent.start === originalEvent.start && arrayEvent.end === originalEvent.end
+          // console.log("arrayEvent : \n"+arrayEvent.start+",\n "+arrayEvent.end);
+          const originalStart = new Date(originalEvent.start)
+          const originalEnd = new Date(originalEvent.end)
+          // console.log("originalEvent : \n"+originalStart+",\n "+originalEnd);
+          // console.log();
+          return arrayEvent.start.getTime() === originalStart.getTime() && arrayEvent.end.getTime() === originalEnd.getTime()
         }
         );
+
+        // console.log("res : "+eventIndex);
 
         if (eventIndex !== -1) {
             if(updatedEvent==null)
             {
               this.events.splice(eventIndex,1)
+              // console.log("Event deleted");
             }
             else
             {
               this.events[eventIndex] = updatedEvent;
               this.mergeOverlapping(updatedEvent)
+              // console.log("Event found and updated");
             }
             this.formatEvents()
         } else {
             // console.log("Event not found.");
         }
 
+        // this.delete(updatedEvent)
+        // const steppedEvent = this.getSteppedEvent(updatedEvent)
+        // this.events.push(steppedEvent)
+      },
+      eventDurationChanged(req)
+      {
+        let {event} = req;
+
+        // const steppedEvent = this.getSteppedEvent(event)
+        // this.delete(event)
+        // this.events.push(steppedEvent)
+
+        // event = steppedEvent
+
+        
+        this.mergeOverlapping(event)
+        this.formatEvents()
+      },
+      eventDeleted(event)
+      {
+        const index = this.events.findIndex(arrayEvent =>{
+          return arrayEvent.start.getTime()==event.start.getTime() &&
+          arrayEvent.end.getTime() == event.end.getTime()
+        })
+        if(index <= -1)
+        {
+          throw new Error("couldnt find event : "+JSON.stringify(event))
+        }
+
+        this.events.splice(index,1)
+      },
+      updateCalendarEvent(originalEvent, updatedEvent) {
+        const req = {
+          event:updatedEvent,
+          originalEvent:originalEvent
+        }
+        this.eventChanged(req)
     },
     async save(){
       this.sending = true
@@ -250,24 +328,73 @@
       // Now uniqueEvents array contains only unique events
       this.events = uniqueEvents;
     },
+    getSteppedEvent(event)
+    {
+      let startMin = event.start.getMinutes()
+      startMin = Math.round(startMin / this.time_step) * this.time_step;
+
+      let endMin = event.end.getMinutes()
+      endMin = Math.round(endMin / this.time_step) * this.time_step;
+
+      const newStart = new Date( event.start )
+      newStart.setMinutes(startMin)
+      const newEnd = new Date( event.end )
+      newEnd.setMinutes(endMin)
+
+      const newEvent = {
+        class: 'apointment',
+        start: newStart,
+        end: newEnd,
+      }
+
+      console.log("stepped event to "+this.time_step+" : "+JSON.stringify(newEvent));
+
+      return newEvent
+    },
     mergeOverlapping(event)
     {
       this.deleteNonUniques()
       const otherOverlapping = this.getOverlapping(event)
 
-      let start = event.start
-      let end = event.end
+      let startTime = event.start.getTime()
+      let endTime = event.end.getTime()
+
+      // console.log("other overlapping : "+JSON.stringify(otherOverlapping));
 
       for (let i = 0; i < otherOverlapping.length; i++) {
         const element = otherOverlapping[i];
-        if(element.start<start)
-          start = element.start
-        if(element.end>end)
-          end = element.end
+        if(element.start.getTime()<startTime)
+          startTime = element.start.getTime()
+        if(element.end.getTime()>endTime)
+          endTime = element.end.getTime()
         this.delete(element)
       }
-      event.start = start
-      event.end = end
+      const start = new Date(startTime) 
+      const end = new Date(endTime) 
+      // console.log("start : "+start+", end : "+end);
+
+
+
+      const index = this.events.findIndex(arrayEvent =>{
+        return arrayEvent.start.getTime()==event.start.getTime() && 
+        arrayEvent.end.getTime()==event.end.getTime()
+      })
+      if(index<=-1)
+      {
+        throw new Error("could not find "+JSON.stringify(event)+" in this.events")
+      }
+      this.events.splice(index,1)
+
+      // console.log("index : "+index);
+
+      const newEvent = {
+        class: 'apointment',
+        start: start,
+        end: end,
+      }
+
+      this.events.push(newEvent)
+
     },
     getOverlapping(event)
     {
@@ -294,12 +421,14 @@
     {
       for (let i = 0; i < this.events.length; i++) {
         const arrayEvent = this.events[i];
-        if(arrayEvent.start==event.start && arrayEvent.end == event.end)
+        if(arrayEvent.start.getTime()==event.start.getTime() && arrayEvent.end.getTime() == event.end.getTime())
         {
+          console.log("found and deleting");
           this.events.splice(i,1);
           return
         }
       }
+      console.log("could not delete");
     }
     }
     ,async mounted()
@@ -347,14 +476,14 @@
 
   </script>
 
-<style>
+<style scoped>
   /* this doesnt work for some reason */
   .week-planning-calendar .vuecal__arrow--next,
   .week-planning-calendar .vuecal__arrow--prev {
     display: none !important;
   }
 
-  .week-planning-calendar  .vuecal__event {
+  >>>.week-planning-calendar  .vuecal__event {
     background-color: green;
     color: white;
   }
