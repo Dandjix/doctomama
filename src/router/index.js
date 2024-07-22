@@ -3,10 +3,14 @@ import Home from '../views/Home.vue';
 import BookRdv from '../views/BookRdv.vue';
 import Login from '../views/Login.vue';
 import Availability from '../views/Availability.vue'
+import Whitelist from '../views/Whitelist.vue'
 
 import NotFound from '../views/NotFound.vue';
 
 const routes = [
+
+  //partie patient
+
   {
     path: '/',
     name: 'Home',
@@ -17,21 +21,31 @@ const routes = [
     name: 'BookRdv',
     component: BookRdv
   },
+
+  // partie prestataire
+
   {
     path: '/login',
     name: 'Login',
     component: Login
-  },
-  {
-    path: '/availability',
-    name: 'UpdateAvailability',
-    component: Availability
   },
   // {
   //   path: '/change-password',
   //   name: 'WeekPlanning',
   //   component: WeekPlanning
   // },
+  {
+    path: '/availability',
+    name: 'UpdateAvailability',
+    component: Availability
+  },
+
+  {
+    path: '/whitelist',
+    name: 'Whitelist',
+    component: Whitelist
+  },
+
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
