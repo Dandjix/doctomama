@@ -26,9 +26,8 @@
         :time-to="minutes_fin"
 
         :time-step="60"
-        :overlaps-per-time-step="true"
 
-        :editable-events="{ title: false, drag: true, resize: true, delete: true, create: false }" 
+        :editable-events="{ title: false, drag: true, resize: false, delete: true, create: false }" 
         :dragToCreateEvent="false"
         :show-day-numbers="false"
 
@@ -50,16 +49,20 @@
     <v-row>
       <v-spacer/>
       <v-spacer/>
-      <v-btn color="red" :disabled="sending||loading" @click="reset">Réinitialiser</v-btn>
+      <v-btn color="red" :disabled="sending||loading" @click="empty">Vider</v-btn>
       <v-spacer/>
-      <v-btn color="primary" :disabled="sending||loading" @click="save">Sauvegarder</v-btn>
+      <v-btn color="yellow" :disabled="sending||loading||!changed" @click="reset">Réinitialiser</v-btn>
+      <v-spacer/>
+      <v-btn color="primary" :disabled="sending||loading||!changed" @click="save">Sauvegarder</v-btn>
       <v-spacer/>
       <v-spacer/>
     </v-row>
 
     <v-row>
       <v-spacer/>
-      <applyPatern :minDate="minDate" :maxDate="maxDate"></applyPatern>
+      <applyPatern ref="applyPatern" :minDate="minDate" :maxDate="maxDate" :planningChanged="changed"
+      @revertChanges="revertChangesAndApply" @applyChanges="applyChangesAndApply">
+      </applyPatern>
       <v-spacer/>
     </v-row>
 
@@ -139,6 +142,7 @@
         minutes_fin:1080,
         loading:true,
         sending:false,
+        changed:false,
         minDate:new Date(),
         maxDate:new Date()
       };
@@ -164,6 +168,9 @@
         }
         if(this.sending||this.loading)
           return
+
+        this.changed = true
+
         const endTime = new Date(date);
         endTime.setHours(endTime.getHours() + 1);
 
@@ -185,12 +192,14 @@
         this.events = await WeekPlanningService.getPlagesHoraires(this.session)
 
         this.minDate = new Date()
+        this.minDate.setHours(0,0,0,0)
         const nbDays = await SettingsService.getSetting("duree_planification")
 
         const maxDate = new Date();
         maxDate.setDate(maxDate.getDate() + nbDays);
         
         this.maxDate = maxDate
+        maxDate.setHours(0,0,0,0)
 
         this.loading = false
       }
@@ -205,6 +214,8 @@
         });
       },
       eventChanged(req){
+        this.changed = true;
+
         let originalEvent = req.originalEvent;
         let updatedEvent = req.event;
 
@@ -260,6 +271,7 @@
       },
       eventDeleted(event)
       {
+        this.changed = true;
         const index = this.events.findIndex(arrayEvent =>{
           return arrayEvent.start.getTime()==event.start.getTime() &&
           arrayEvent.end.getTime() == event.end.getTime()
@@ -282,11 +294,17 @@
       this.sending = true
       await WeekPlanningService.setPlagesHoraires(this.session,this.events)
       // await new Promise(resolve => setTimeout(resolve, 1000));
+      this.changed = false
       this.sending = false
     },
-    reset(){
-      console.log(JSON.stringify(this.events));
+    empty(){
+      // console.log(JSON.stringify(this.events));
+      this.changed=true
       this.events = []
+    },
+    async reset(){
+      this.events = await WeekPlanningService.getPlagesHoraires(this.session)
+      this.changed = false
     },
     formatEvents() {
       // console.log("formatting events");
@@ -423,12 +441,22 @@
         const arrayEvent = this.events[i];
         if(arrayEvent.start.getTime()==event.start.getTime() && arrayEvent.end.getTime() == event.end.getTime())
         {
-          console.log("found and deleting");
+          // console.log("found and deleting");
           this.events.splice(i,1);
           return
         }
       }
-      console.log("could not delete");
+      // console.log("could not delete");
+    },
+    async revertChangesAndApply()
+    {
+      await this.reset()
+      this.$refs.applyPatern.applyPatern()
+    },
+    applyChangesAndApply()
+    {
+      this.save()
+      this.$refs.applyPatern.applyPatern()
     }
     }
     ,async mounted()

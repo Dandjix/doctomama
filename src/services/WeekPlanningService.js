@@ -1,4 +1,5 @@
 import {getPlagesHoraires,setPlagesHoraires} from '../models/WeekPlanning'
+import { setOpenSpans } from '@/models/OpenSpans';
 
 const WeekPlanningService = {
   async getPlagesHoraires(session) {
@@ -23,19 +24,59 @@ const WeekPlanningService = {
         console.error('WeekPlanningService Error:', error);
         throw error; // Re-throw the error to handle it in the component
     }
+  },
 
+  async applyPatern(session,start,end){
+    const plagesPlanning = await getPlagesHoraires(session)
+    const startDate = new Date(start)
+    const endDate = new Date(end)
 
+    let workingDate = new Date(startDate)
+
+    let spans = []
+
+    while(workingDate.getTime()<=endDate.getTime())
+    {
+      const dayOfWeek = (workingDate.getDay()-1)%7 //0 for monday, 6 for sunday
+
+      // console.log("day of week : "+dayOfWeek);
+
+      const plagesForDate = plagesPlanning.filter(plage => 
+        {
+          // console.log("plage : "+JSON.stringify(plage));
+          // console.log("plage.jour_semaine : "+plage.jour_semaine);
+          return plage.jour_semaine_id == dayOfWeek
+        })
+
+      console.log("plagesForDate : "+plagesForDate);
+
+      for (let i = 0; i < plagesForDate.length; i++) {
+        const plage = plagesForDate[i];
+        const startDate = new Date(workingDate)
+        const [startH,startM] = plage.heure_debut.split(":")
+        const [endH,endM] = plage.heure_fin.split(":")
+        startDate.setHours(startH,startM)
+        endDate.setHours(endH,endM)
+
+        const span = {
+          debut:startDate,
+          fin:endDate
+        };
+
+        // console.log("for "+workingDate+" : "+JSON.stringify(span));
+
+        spans.push(span)
+      }
+      workingDate.setDate(workingDate.getDate()+1)
+    }
+
+    // console.log("spans : "+JSON.stringify(spans));
+
+    await setOpenSpans(session,start,end,spans)
+    // await apply(session,start,end)
   }
 };
-// {"start":"1970-01-07T09:05:00.000Z","end":"1970-01-07T10:05:00.000Z"}
-// const origin = "1970-01-05"
 
-// function getDayIndex(date)
-// {
-//     console.log(origin);
-//     const day = date.getDay()
-//     return day;
-// }
 
 function createOriginalDate(dayIndex,time)
 {
@@ -68,6 +109,7 @@ function toPlages(events)
 
 function toEvents(plages)
 {
+  // console.log("plages : "+JSON.stringify(plages));
     let events = []
     // console.log("toEvents : "+JSON.stringify(plages));
     for (let i = 0; i < plages.length; i++) {
