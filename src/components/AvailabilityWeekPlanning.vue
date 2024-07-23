@@ -56,8 +56,6 @@
       <v-spacer/>
       <v-btn color="primary" :disabled="sending||loading||!changed" @click="save">Sauvegarder</v-btn>
       <v-spacer/>
-      <v-btn color="primary" :disabled="sending||loading" @click="logEvents">Log</v-btn>
-      <v-spacer/>
       <v-spacer/>
     </v-row>
 
@@ -324,9 +322,9 @@
       this.changed=true
       this.events = []
     },
-    async logEvents(){
-      console.log(JSON.stringify(this.events));
-    },
+    // async logEvents(){
+    //   console.log(JSON.stringify(this.events));
+    // },
     async reset(){
       this.events = await WeekPlanningService.getPlagesHoraires(this.session)
       this.changed = false
