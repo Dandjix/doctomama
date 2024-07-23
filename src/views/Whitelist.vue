@@ -196,7 +196,7 @@ export default {
             rules: [
                 v => !!v || 'Email requis',
                 v => /.+@.+\..+/.test(v) || 'Email invalide',
-                v => /^[a-zA-Z0-9\u0400-\u04FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\uAC00-\uD7AF@.]+$/.test(v) || 'Cet email contient des charactères invalides'
+                v => /^[a-zA-Z0-9\u0400-\u04FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\uAC00-\uD7AF@.-]+$/.test(v) || 'Cet email contient des charactères invalides'
             ]
         }
     },
