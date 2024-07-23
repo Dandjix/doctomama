@@ -86,14 +86,25 @@ export default {
             // this.emails.splice(index,1)
             await WhitelistService.deleteItem(this.session,this.emailToDelete)
 
-            const nbPages = await WhitelistService.getNbPages(this.session,this.patern)
+            this.nbPages = await WhitelistService.getNbPages(this.session,this.patern)
 
-            if(this.page>nbPages)
-                this.page = nbPages;
+            if(this.page>this.nbPages)
+                this.page = this.nbPages;
 
-            this.emails = await WhitelistService.getItems(this.session,this.page-1,this.patern)
+            console.log("nb pages : "+this.nbPages);
+            if(this.nbPages>0)
+            {
+                this.emails = await WhitelistService.getItems(this.session,this.page-1,this.patern)     
+            }
+            else
+            {
+                this.emails = []
+            }
+
 
             this.loading = false
+
+            console.log("at the end !");
         },
         async addEmail(){
 
@@ -137,8 +148,10 @@ export default {
 
             // await delay(500)
 
+            if(this.nbPages>0){
+                this.emails = await WhitelistService.getItems(this.session,this.page-1,this.patern)
+            }
 
-            this.emails = await WhitelistService.getItems(this.session,this.page-1,this.patern)
 
 
             // await delay(500)
@@ -157,8 +170,14 @@ export default {
             // await delay(500)
 
             this.page = 1
-            this.emails = await WhitelistService.getItems(this.session,this.page-1,this.patern)
+
             this.nbPages = await WhitelistService.getNbPages(this.session,this.patern)
+            if(this.nbPages>0){
+                this.emails = await WhitelistService.getItems(this.session,this.page-1,this.patern)
+            }
+            else{
+                this.emails=[]
+            }
 
             // await delay(500)
 
@@ -179,7 +198,7 @@ export default {
     },
     data(){
         return {
-            emails:['jean@email.fr','bombeur@email.fr'],
+            emails:[],
 
             nbPages:0,
             page:1,//number displayed on the page selector. page -1 is the actual page
@@ -204,7 +223,10 @@ export default {
     {
         this.nbPages = await WhitelistService.getNbPages(this.session,this.patern)
         // console.log("there are "+JSON.stringify(this.nbPages)+" pages");
-        this.emails = await WhitelistService.getItems(this.session,this.page-1,this.patern)
+        if(this.nbPages>0)
+            this.emails = await WhitelistService.getItems(this.session,this.page-1,this.patern)
+        else
+            this.emails=[]
     }
 
 
