@@ -2,7 +2,7 @@
   <h1>Planning hebdomadaire</h1>
   <v-col>
     <v-row>
-      <stepSelector v-if="false" v-model="time_step" style=""></stepSelector>
+      <stepSelector v-model="time_step" style=""></stepSelector>
     </v-row>
     <v-row>
       <vue-cal
@@ -27,15 +27,16 @@
 
         :time-step="60"
 
-        :editable-events="{ title: false, drag: true, resize: false, delete: true, create: false }" 
-        :dragToCreateEvent="false"
+        :editable-events="{ title: false, drag: true, resize: true, delete: true, create: true }" 
+        :dragToCreateEvent="true"
         :show-day-numbers="false"
 
         :disabled="sending||loading"
 
         @event-click="eventClicked"
-        @cell-click="cellClicked"
-        @event-change="eventChanged"
+        @event-drag-create="eventCreated"
+
+        @event-drop="eventDropped"
         @event-duration-change="eventDurationChanged"
         @event-delete="eventDeleted"
         />
@@ -54,6 +55,8 @@
       <v-btn color="yellow" :disabled="sending||loading||!changed" @click="reset">Réinitialiser</v-btn>
       <v-spacer/>
       <v-btn color="primary" :disabled="sending||loading||!changed" @click="save">Sauvegarder</v-btn>
+      <v-spacer/>
+      <v-btn color="primary" :disabled="sending||loading" @click="logEvents">Log</v-btn>
       <v-spacer/>
       <v-spacer/>
     </v-row>
@@ -159,30 +162,46 @@
         this.dialogVisible = true
         this.selectedEvent = event
       },
-      cellClicked(date)
+      eventCreated(event)
       {
-        if(!(date instanceof Date))
-        {
-          // console.log("you clicked something else than a date mate");
-          return
-        }
-        if(this.sending||this.loading)
-          return
+        // console.log("created an event : "+JSON.stringify(event));
 
-        this.changed = true
+        this.applyStep(event)
 
-        const endTime = new Date(date);
-        endTime.setHours(endTime.getHours() + 1);
+        this.events.push(event)
 
-        const event = {
-          class: 'apointment',
-          start: date,
-          end: endTime,
-        }
-        this.events.push(event);
+
+
         this.mergeOverlapping(event)
         this.formatEvents()
+        // return false
       },
+      // cellClicked(date)
+      // {
+      //   if(!(date instanceof Date))
+      //   {
+      //     // console.log("you clicked something else than a date mate");
+      //     return
+      //   }
+      //   if(this.sending||this.loading)
+      //     return
+
+      //   console.log("cell clicked !");
+        
+      //   this.changed = true
+
+      //   const endTime = new Date(date);
+      //   endTime.setHours(endTime.getHours() + 1);
+
+      //   const event = {
+      //     class: 'apointment',
+      //     start: date,
+      //     end: endTime,
+      //   }
+      //   this.events.push(event);
+      //   this.mergeOverlapping(event)
+      //   this.formatEvents()
+      // },
       async load(){
         this.heure_debut = await SettingsService.getSetting("heure_debut_calendrier")
         this.heure_fin = await SettingsService.getSetting("heure_fin_calendrier")
@@ -213,11 +232,13 @@
             }
         });
       },
-      eventChanged(req){
+      eventDropped(req){
         this.changed = true;
 
         let originalEvent = req.originalEvent;
         let updatedEvent = req.event;
+
+        this.applyStep(updatedEvent)
 
         // updatedEvent = this.getSteppedEvent(updatedEvent)
 
@@ -257,6 +278,7 @@
       },
       eventDurationChanged(req)
       {
+        this.changed=true
         let {event} = req;
 
         // const steppedEvent = this.getSteppedEvent(event)
@@ -264,7 +286,7 @@
         // this.events.push(steppedEvent)
 
         // event = steppedEvent
-
+        this.applyStep(event)
         
         this.mergeOverlapping(event)
         this.formatEvents()
@@ -288,7 +310,7 @@
           event:updatedEvent,
           originalEvent:originalEvent
         }
-        this.eventChanged(req)
+        this.eventDropped(req)
     },
     async save(){
       this.sending = true
@@ -302,9 +324,26 @@
       this.changed=true
       this.events = []
     },
+    async logEvents(){
+      console.log(JSON.stringify(this.events));
+    },
     async reset(){
       this.events = await WeekPlanningService.getPlagesHoraires(this.session)
       this.changed = false
+    },
+    applyStep(event){
+      // console.log("applying step ..."+JSON.stringify(event));
+      var start = event.start
+      var end = event.end
+
+      const newMinStart = Math.round(start.getMinutes()/this.time_step)*this.time_step
+      const newMinEnd = Math.round(end.getMinutes()/this.time_step)*this.time_step
+
+      start.setMinutes(newMinStart)
+      end.setMinutes(newMinEnd)
+
+      event.start = start
+      event.end = end
     },
     formatEvents() {
       // console.log("formatting events");
