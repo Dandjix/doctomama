@@ -7,7 +7,7 @@
             </v-col>
 
             <v-col>
-                <v-btn color="red" text="Supprimer" @click="$emit('delete',email)"></v-btn>
+                <v-btn color="red" text="Supprimer" @click="$emit('delete',email)" :disabled="disabled"></v-btn>
             </v-col>
             <v-spacer></v-spacer>
         </v-row>
@@ -23,6 +23,10 @@
             email:{
                 type: String,
                 required: true
+            },
+            disabled:{
+                type:Boolean,
+                value:false
             }
         }
     }

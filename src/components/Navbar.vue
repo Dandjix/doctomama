@@ -8,6 +8,8 @@
 
     <v-toolbar-items>
       
+      <v-btn to="/test">Test</v-btn>
+
       <template v-if="isLoggedIn">
         <v-btn to="/whitelist">Enregistrer des patient·e·s</v-btn>
         <v-btn to="/availability">Modifier mes disponibilités</v-btn>

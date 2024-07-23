@@ -1,5 +1,5 @@
 <template>
-    <WhitelistItem v-for="email in emails" :email="email" :key="email" @delete="deleteItem"></WhitelistItem>
+    <WhitelistItem v-for="email in emails" :email="email" :key="email" @delete="deleteItem" :disabled="disabled"></WhitelistItem>
 </template>
 
 <script>
@@ -22,6 +22,10 @@
             emails:{
                 type:[String],
                 required:true
+            },
+            disabled:{
+                type:Boolean,
+                value:false
             }
         }
     }

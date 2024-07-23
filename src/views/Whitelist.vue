@@ -1,14 +1,15 @@
 <template>
     <h1>Patient·e·s authorisé·e·s :</h1>
 
-    <v-sheet class="mx-auto" width="400">
-        <v-form @submit.prevent>
+    <v-sheet class="mx-auto" width="400" height="190">
+        <v-form ref="addForm" @submit.prevent="addEmail" >
             <v-text-field
-            v-model="firstName"
+            v-model="emailToAdd"
             :rules="rules"
             label="Email à ajouter"
+
             ></v-text-field>
-            <v-btn class="mt-2" type="submit" block>Submit</v-btn>
+            <v-btn class="mt-2" type="submit" color="primary" block>Ajouter</v-btn>
         </v-form>
     </v-sheet>
 
@@ -18,9 +19,16 @@
         <v-spacer></v-spacer>
     </v-sheet>
 
+    <v-row>
+        <v-spacer></v-spacer>
+        <v-progress-circular indeterminate v-if="loading"></v-progress-circular>
+        <v-spacer></v-spacer>
+    </v-row>
+
+
     <v-pagination :length="nbPages" v-model="page" :disabled="loading"></v-pagination>
 
-    <Whitelist :emails="emails" @deleteItem="deleteItem"></Whitelist>
+    <Whitelist :emails="emails" @deleteItem="deleteItem" :disabled="loading"></Whitelist>
 
     <v-pagination :length="nbPages" v-model="page" :disabled="loading"></v-pagination>
 
@@ -30,6 +38,7 @@
             <v-card-text>Êtes vous sûr·e de vouloir supprimer : <b>{{ emailToDelete }}</b>  de vos patient·e·s authorisé·e·s ?</v-card-text>
             <v-card-actions>
             <v-spacer></v-spacer>
+            <v-checkbox label="ne plus me demander" v-model="dontAskToDelete"></v-checkbox>
             <v-btn color="primary" text @click="abortDelete">Annuler</v-btn>
             <v-btn color="red" text @click="confirmDelete">Supprimer</v-btn>
             </v-card-actions>
@@ -53,32 +62,108 @@ export default {
         deleteItem(email){
             // console.log("deleting email : "+email);
             // console.log(JSON.stringify(this.emails));
-            this.deletionDialog=true
-            this.emailToDelete=email
 
+            if(!this.dontAskToDelete)
+            {
+                this.deletionDialog=true
+                this.emailToDelete=email
+            }
+            else
+            {
+                this.emailToDelete=email
+                this.confirmDelete()
+            }
         },
         abortDelete(){
             this.deletionDialog=false
         },
-        confirmDelete(){
-            const index = this.emails.indexOf(this.emailToDelete)
-            this.emails.splice(index,1)
-
+        async confirmDelete(){
+            this.loading=true
             this.deletionDialog=false
+
+
+            // const index = this.emails.indexOf(this.emailToDelete)
+            // this.emails.splice(index,1)
+            await WhitelistService.deleteItem(this.session,this.emailToDelete)
+
+            const nbPages = await WhitelistService.getNbPages(this.session,this.patern)
+
+            if(this.page>nbPages)
+                this.page = nbPages;
+
+            this.emails = await WhitelistService.getItems(this.session,this.page-1,this.patern)
+
+            this.loading = false
         },
-        addEmail(){
-            if(this.emailToAdd)
-            console.log(this.emailToAdd);
-            this.emailToAdd = ""
+        async addEmail(){
+
+            this.loading=true
+
+            const addForm = this.$refs.addForm
+            const validRes = await addForm.validate()
+            const isValid = validRes.valid
+            if(!isValid)
+            {
+                this.loading = false
+                // console.log("invalid add form");
+                return;
+            }
+            // console.log("validate passed");
+
+            // console.log("dans add email  : "+this.emailToAdd);
+
+
+
+            await WhitelistService.addItem(this.session,this.emailToAdd)
+
+
+
+            this.nbPages = await WhitelistService.getNbPages(this.session,this.patern)
+            if(this.page>this.nbPages)
+                this.page = this.nbPages
+
+
+            this.emails = await WhitelistService.getItems(this.session,this.page-1,this.patern)
+
+            this.loading = false
         },
         async pageChanged(){
-            // console.log("page changed to : "+this.page);
+
+            // const delay = millis => new Promise((resolve) => {
+            //     setTimeout(() => resolve(), millis)
+            // });
+
+            this.loading=true
+
+            // await delay(500)
+
+
             this.emails = await WhitelistService.getItems(this.session,this.page-1,this.patern)
+
+
+            // await delay(500)
+
+            this.loading = false
         },
         async paternChanged(){
+
+
+            // const delay = millis => new Promise((resolve) => {
+            //     setTimeout(() => resolve(), millis)
+            // });
+
+            this.loading=true
+
+            // await delay(500)
+
             this.page = 1
             this.emails = await WhitelistService.getItems(this.session,this.page-1,this.patern)
             this.nbPages = await WhitelistService.getNbPages(this.session,this.patern)
+
+            // await delay(500)
+
+            this.loading = false
+
         }
     },
     computed:{
@@ -103,9 +188,16 @@ export default {
             loading:false,
 
             deletionDialog:false,
+            dontAskToDelete:false,
             emailToDelete:"",
 
-            emailToAdd:""
+            emailToAdd:"",
+
+            rules: [
+                v => !!v || 'Email requis',
+                v => /.+@.+\..+/.test(v) || 'Email invalide',
+                v => /^[a-zA-Z0-9\u0400-\u04FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\uAC00-\uD7AF@.]+$/.test(v) || 'Cet email contient des charactères invalides'
+            ]
         }
     },
     async mounted()

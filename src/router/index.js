@@ -5,6 +5,8 @@ import Login from '../views/Login.vue';
 import Availability from '../views/Availability.vue'
 import Whitelist from '../views/Whitelist.vue'
 
+import Test from '../views/Test.vue'
+
 import NotFound from '../views/NotFound.vue';
 
 const routes = [
@@ -44,6 +46,12 @@ const routes = [
     path: '/whitelist',
     name: 'Whitelist',
     component: Whitelist
+  },
+
+  {
+    path: '/test',
+    name: 'Test',
+    component: Test
   },
 
   {

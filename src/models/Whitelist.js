@@ -21,8 +21,27 @@ const getNbPages = async (session,patern) => {
     }
 };
 
+const addItem = async(session,email) => {
+    try{
+        await axios.post(`${BASE_URL}/whitelist?session=${session}&email=${email}`); 
+    }
+    catch(error){
+        throw Error('Error while adding email to whitelist')
+    }
+}
+const deleteItem = async(session,email) => {
+    try{
+        await axios.delete(`${BASE_URL}/whitelist?session=${session}&email=${email}`); 
+    }
+    catch(error){
+        throw Error('Error while adding email to whitelist')
+    }
+}
+
 export
 {
     getItems,
-    getNbPages
+    getNbPages,
+    addItem,
+    deleteItem
 }
