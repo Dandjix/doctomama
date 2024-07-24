@@ -230,13 +230,17 @@
             }
         });
       },
-      eventDropped(req){
+      eventDropped(req,applyStep=true){
         this.changed = true;
 
         let originalEvent = req.originalEvent;
         let updatedEvent = req.event;
 
-        this.applyStep(updatedEvent)
+        if(applyStep)
+        {
+          this.applyStep(updatedEvent)
+        }
+
 
         // updatedEvent = this.getSteppedEvent(updatedEvent)
 
@@ -308,7 +312,7 @@
           event:updatedEvent,
           originalEvent:originalEvent
         }
-        this.eventDropped(req)
+        this.eventDropped(req,false)
     },
     async save(){
       this.sending = true
