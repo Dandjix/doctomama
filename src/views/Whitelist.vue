@@ -124,19 +124,26 @@ export default {
             // console.log("dans add email  : "+this.emailToAdd);
 
 
+            try{
+                await WhitelistService.addItem(this.session,this.emailToAdd)
 
-            await WhitelistService.addItem(this.session,this.emailToAdd)
+                this.nbPages = await WhitelistService.getNbPages(this.session,this.patern)
+                if(this.page>this.nbPages)
+                    this.page = this.nbPages
+                else if(this.page<1)
+                    this.page=1
 
+                this.emails = await WhitelistService.getItems(this.session,this.page-1,this.patern)
+            }
+            catch(error)
+            {
+                alert("Impossible d'ajouter cet email. Existe-t-il déja ?")
+            }
+            finally
+            {
+                this.loading = false
+            }
 
-
-            this.nbPages = await WhitelistService.getNbPages(this.session,this.patern)
-            if(this.page>this.nbPages)
-                this.page = this.nbPages
-
-
-            this.emails = await WhitelistService.getItems(this.session,this.page-1,this.patern)
-
-            this.loading = false
         },
         async pageChanged(){
 
