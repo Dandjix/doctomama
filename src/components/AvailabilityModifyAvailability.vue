@@ -10,27 +10,26 @@
 
         v-model:events="events"
 
-        class="availability-calendar vuecal--full-height-delete"
+        class="calendar vuecal--full-height-delete"
         :locale="fr"
-
 
         :time-from="minutes_debut"
         :time-to="minutes_fin"
 
         :time-step="60"
-        :overlaps-per-time-step="true"
 
-        :editable-events="{ title: false, drag: false, resize: false, delete: false, create: false }" 
-        :dragToCreateEvent="false"
+        :editable-events="{ title: false, drag: true, resize: true, delete: true, create: true }" 
+        :dragToCreateEvent="true"
         :show-day-numbers="false"
 
         :disabled="sending||loading"
 
-        :min-date="minDate"
-        :max-date="maxDate"
-
         @event-click="eventClicked"
-        @cell-click="cellClicked"
+        @event-drag-create="eventCreated"
+
+        @event-drop="eventDropped"
+        @event-duration-change="eventDurationChanged"
+        @event-delete="eventDeleted"
         />
 
     </v-row>
@@ -57,12 +56,31 @@
   
 
 </template>
-  
-  <script>
+
+<style scoped>
+  /* this doesnt work for some reason */
+  .calendar .vuecal__arrow--next,
+  .calendar .vuecal__arrow--prev {
+    display: none !important;
+  }
+
+  >>>.calendar  .vuecal__event {
+    background-color: green;
+    color: white;
+  }
+
+  .calendar {
+    height: 500px;
+  }
+</style>
+
+
+<script>
   import VueCal from 'vue-cal';
   import 'vue-cal/dist/vuecal.css';
   import SettingsService from '../services/SettingsService';
   // import WeekPlanningService from '@/services/WeekPlanningService';
+  import OpenSpansService from '@/services/OpenSpansService';
   import {mapState} from 'vuex'
   import modifyDialog from './AvailabilityWeekPlanningModifyDialog'
   // import stepSelector from './TimeStepSelector.vue'
@@ -121,27 +139,6 @@
         this.dialogVisible = true
         this.selectedEvent = event
       },
-      cellClicked(date)
-      {
-        if(!(date instanceof Date))
-        {
-          // console.log("you clicked something else than a date mate");
-          return
-        }
-        if(this.sending||this.loading)
-          return
-        const endTime = new Date(date);
-        endTime.setHours(endTime.getHours() + 1);
-
-        const event = {
-          class: 'apointment',
-          start: date,
-          end: endTime,
-        }
-        this.events.push(event);
-        this.mergeOverlapping(event)
-        this.formatEvents()
-      },
       async load(){
         this.heure_debut = await SettingsService.getSetting("heure_debut_calendrier")
         this.heure_fin = await SettingsService.getSetting("heure_fin_calendrier")
@@ -159,6 +156,12 @@
         // console.log("session : "+this.session);
         // this.events = await WeekPlanningService.getPlagesHoraires(this.session)
 
+        const events = await OpenSpansService.getSpans(this.session)
+        console.log("events : "+JSON.stringify(events));
+
+        this.events = events
+
+        // this.events = [{start:new Date(), end:new Date()}]
 
         this.loading = false
       },

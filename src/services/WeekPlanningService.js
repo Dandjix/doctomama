@@ -35,6 +35,10 @@ const WeekPlanningService = {
 
     let spans = []
 
+    // console.log("end date : "+JSON.stringify(endDate));
+
+    // console.log("applying patern. plagesPlanning : "+JSON.stringify(plagesPlanning));
+
     while(workingDate.getTime()<=endDate.getTime())
     {
       const dayOfWeek = (workingDate.getDay()-1)%7 //0 for monday, 6 for sunday
@@ -48,29 +52,34 @@ const WeekPlanningService = {
           return plage.jour_semaine_id == dayOfWeek
         })
 
-      console.log("plagesForDate : "+plagesForDate);
+      // console.log("plagesForDate : "+JSON.stringify(plagesForDate));
 
       for (let i = 0; i < plagesForDate.length; i++) {
         const plage = plagesForDate[i];
-        const startDate = new Date(workingDate)
-        const [startH,startM] = plage.heure_debut.split(":")
-        const [endH,endM] = plage.heure_fin.split(":")
-        startDate.setHours(startH,startM)
-        endDate.setHours(endH,endM)
-
+        const startDate = new Date(workingDate);
+        const endDate = new Date(workingDate);
+        const [startH, startM] = plage.heure_debut.split(":");
+        const [endH, endM] = plage.heure_fin.split(":");
+      
+        startDate.setHours(startH, startM, 0, 0);
+        endDate.setHours(endH, endM, 0, 0);
+      
+        // Adjust for local time zone offset
+        const timezoneOffset = startDate.getTimezoneOffset() * 60000; // in milliseconds
+      
         const span = {
-          debut:startDate,
-          fin:endDate
+          debut: new Date(startDate.getTime() - timezoneOffset),
+          fin: new Date(endDate.getTime() - timezoneOffset)
         };
-
-        // console.log("for "+workingDate+" : "+JSON.stringify(span));
-
-        spans.push(span)
+      
+        // console.log("for " + workingDate + " : " + JSON.stringify(span));
+      
+        spans.push(span);
       }
       workingDate.setDate(workingDate.getDate()+1)
     }
 
-    // console.log("spans : "+JSON.stringify(spans));
+    console.log("spans : "+JSON.stringify(spans));
 
     await setOpenSpans(session,start,end,spans)
     // await apply(session,start,end)

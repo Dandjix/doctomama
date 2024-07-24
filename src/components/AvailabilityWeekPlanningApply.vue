@@ -82,11 +82,19 @@ export default {
   props: {
     minDate: {
       type: Date,
-      default: () => new Date()
+      default: () => {
+        var date = new Date()
+        date.setHours(0,0,0,0)
+        return date
+      }
     },
     maxDate: {
       type: Date,
-      default: () => new Date()
+      default: () => {
+        var date = new Date()
+        date.setHours(0,0,0,0)
+        return date
+      }
     },
     planningChanged: {
       type: Boolean,
@@ -96,11 +104,14 @@ export default {
   watch: {
     maxDate(value) {
       this.date_fin = value;
+      this.date_fin.setHours(0,0,0,0)
     }
   },
   data() {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
     return {
-      date_debut: new Date(),
+      date_debut: date,
       date_fin: this.maxDate,
       dialogVisible: false
     };
@@ -122,9 +133,10 @@ export default {
     {
       // this.date_debut
       // this.date_fin
-      console.log("applying ...");
+      // console.log("applying ...");
+      console.log(`debut : ${JSON.stringify(this.date_debut)}, fin : ${JSON.stringify(this.date_fin)}`);
       await WeekPlanningService.applyPatern(this.session,this.date_debut,this.date_fin)
-      console.log("applied !");
+      // console.log("applied !");
     },
     deleteUnsavedChanges()
     {

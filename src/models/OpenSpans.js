@@ -5,10 +5,13 @@ const getOpenSpans = async (session) => {
     try {
         // console.log("about to get ..");
         const response = await axios.get(`${BASE_URL}/openSpans?session=${session}`);
-        // console.log("data : "+response.data);
+        // console.log("data : "+JSON.stringify(response.data));
         return response.data;
+
+        // console.log("session : "+session);
+        // return []
     } catch (error) {
-        throw Error('Error getting open spans');
+        throw Error('Error getting open spans : '+error);
     }
 };
 
