@@ -163,7 +163,7 @@
       eventCreated(event)
       {
         // console.log("created an event : "+JSON.stringify(event));
-
+        this.changed = true
         this.applyStep(event)
 
         this.events.push(event)
