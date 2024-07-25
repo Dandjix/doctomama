@@ -46,7 +46,7 @@
 <script>
 
 import CalendarModifyAvailability from '../components/AvailabilityModifyAvailability.vue';
-import CalendarPlanVacations from '../components/AvailibilityPlanVacations.vue';
+import CalendarPlanVacations from '../components/AvailabilityPlanVacations.vue';
 import CalendarWeekPlanning from '../components/AvailabilityWeekPlanning.vue';
 import AvailabilitySettings from '../components/AvailabilitySettings.vue'
 

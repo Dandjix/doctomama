@@ -554,6 +554,7 @@
 
   >>>.week-planning-calendar  .vuecal__event {
     background-color: green;
+    border: 1px solid rgb(5, 99, 0);
     color: white;
   }
 
