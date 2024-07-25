@@ -41,7 +41,9 @@ const WeekPlanningService = {
 
     while(workingDate.getTime()<=endDate.getTime())
     {
-      const dayOfWeek = (workingDate.getDay()-1)%7 //0 for monday, 6 for sunday
+      var dayOfWeek = (workingDate.getDay()-1)%7 //0 for monday, 6 for sunday
+      if(dayOfWeek<0)
+        dayOfWeek+=7
 
       // console.log("day of week : "+dayOfWeek);
 
@@ -79,7 +81,7 @@ const WeekPlanningService = {
       workingDate.setDate(workingDate.getDate()+1)
     }
 
-    console.log("spans : "+JSON.stringify(spans));
+    // console.log("spans : "+JSON.stringify(spans));
 
     await setOpenSpans(session,start,end,spans)
     // await apply(session,start,end)

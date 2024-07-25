@@ -28,6 +28,7 @@ const setOpenSpans = async (session,start,end,plages) => {
         await axios.post(`${BASE_URL}/openSpans?session=${session}&start=${start}&end=${end}`,plages);
         return;
     } catch (error) {
+        console.error('Error setting open spans : '+error);
         throw Error('Error setting open spans');
     }
 };

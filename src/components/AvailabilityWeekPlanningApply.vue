@@ -134,7 +134,7 @@ export default {
       // this.date_debut
       // this.date_fin
       // console.log("applying ...");
-      console.log(`debut : ${JSON.stringify(this.date_debut)}, fin : ${JSON.stringify(this.date_fin)}`);
+      // console.log(`debut : ${JSON.stringify(this.date_debut)}, fin : ${JSON.stringify(this.date_fin)}`);
       await WeekPlanningService.applyPatern(this.session,this.date_debut,this.date_fin)
       // console.log("applied !");
     },
