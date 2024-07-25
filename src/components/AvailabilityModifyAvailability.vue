@@ -30,6 +30,9 @@
         @event-drop="eventDropped"
         @event-duration-change="eventDurationChanged"
         @event-delete="eventDeleted"
+
+        :minDate="minDate"
+        :maxDate="maxDate"
         />
 
     </v-row>
@@ -155,8 +158,6 @@ export default {
 
       this.events.push(event)
 
-
-
       this.mergeOverlapping(event)
       this.formatEvents()
       // return false
@@ -171,6 +172,7 @@ export default {
 
       this.minDate = new Date()
       this.minDate.setHours(0,0,0,0)
+      this.minDate.setDate(this.minDate.getDate()+2)
       const nbDays = await SettingsService.getSetting("duree_planification")
 
       const maxDate = new Date();
@@ -268,6 +270,27 @@ export default {
   async save(){
     this.sending = true
     // await WeekPlanningService.setPlagesHoraires(this.session,this.events)
+    // const nbDaysPlanification = await SettingsService.getSetting("duree_planification")
+    // var start = new Date();
+
+    // var end = new Date(start)
+
+    // end.setDate(end.getDate()+nbDaysPlanification)
+
+
+    // start = formatDate(start)
+    // end = formatDate(end)
+
+    const start = '1970-01-01'
+    const end = '9999-01-01'
+    // console.log("start : "+start+", end : "+end);
+
+
+    // const spans = toSpans(this.events)
+
+    await openSpansService.setSpans(this.session,start,end,this.events)
+
+    // console.log("set spans !");
     // await new Promise(resolve => setTimeout(resolve, 1000));
     this.changed = false
     this.sending = false
@@ -491,6 +514,18 @@ function compareHours(begin,end)
   }
   return minB<minE
 }
+
+// function formatDate(date)
+// {
+//   const year = date.getUTCFullYear()
+//   const month = zeroPad((date.getUTCMonth()))
+//   const day = zeroPad(date.getUTCDate())
+//   return `${year}-${month}-${day}`
+// }
+
+// function zeroPad(value) {
+//     return value.toString().padStart(2, '0');
+// }
 
 
 </script>

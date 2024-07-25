@@ -15,8 +15,10 @@ const openSpansService = {
         }
     },
 
-    async setSpans(session,start,end,spans)
+    async setSpans(session,start,end,events)
     {
+        const spans = toSpans(events)
+        // console.log("spans (in set spans) : "+JSON.stringify(spans));
         try{
             await setOpenSpans(session,start,end,spans)
             return true
@@ -42,5 +44,34 @@ function toEvents(openSpans)
     }
     return events
 }
+
+function toSpans(events)
+{
+    var spans = []
+    for (let i = 0; i < events.length; i++) {
+        const span = events[i];
+
+        const start = span.start
+        // start.setUTCMonth(start.getUTCMonth()+1)
+        const end = span.end
+        // end.setUTCMonth(end.getUTCMonth()+1)
+
+        // console.log("span : "+JSON.stringify(span));
+        spans.push({
+            debut: start,
+            fin: end
+        })
+    }
+    return spans
+}
+
+// function formatDate(date)
+// {
+//     return `${date.getUTCFullYear()}-${zeroPad(date.getUTCMonth())}-${zeroPad(date.getUTCDate())}`
+// }
+
+// function zeroPad(value) {
+//     return value.toString().padStart(2, '0');
+// }
 
 export default openSpansService;
