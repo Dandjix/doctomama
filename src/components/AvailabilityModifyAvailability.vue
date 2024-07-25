@@ -172,7 +172,7 @@ export default {
 
       this.minDate = new Date()
       this.minDate.setHours(0,0,0,0)
-      this.minDate.setDate(this.minDate.getDate()+2)
+      this.minDate.setDate(this.minDate.getDate())
       const nbDays = await SettingsService.getSetting("duree_planification")
 
       const maxDate = new Date();
