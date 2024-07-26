@@ -65,13 +65,6 @@ function toSpans(events)
     return spans
 }
 
-// function formatDate(date)
-// {
-//     return `${date.getUTCFullYear()}-${zeroPad(date.getUTCMonth())}-${zeroPad(date.getUTCDate())}`
-// }
 
-// function zeroPad(value) {
-//     return value.toString().padStart(2, '0');
-// }
 
 export default openSpansService;

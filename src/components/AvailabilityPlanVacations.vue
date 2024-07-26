@@ -1,8 +1,15 @@
 <template>
-    <h1>planifier mes vancances</h1>
-    <div>
+    <v-col>
+      <v-row>
+        <v-spacer></v-spacer>
+        <h1>planifier mes vancances</h1>
+        <v-spacer></v-spacer>
+      </v-row>
+
+
+      <v-row>
       <vue-cal
-        style="height: 600px"
+        style="height: 400px"
         :events="events"
         class="vacation-calendar"
         :locale="fr"
@@ -10,7 +17,21 @@
 
         :time="false" active-view="week" :disable-views="['day']"
       />
-    </div>
+    </v-row>
+
+    <v-row>
+      <v-spacer></v-spacer>
+        <v-btn color="red" @click="reset">Réinitialiser</v-btn>
+      <v-spacer></v-spacer>
+        <v-btn color="primary" @click="save">Sauvegarder</v-btn>
+      <v-spacer></v-spacer>
+      <!-- <v-btn color="primary" @click="log">Log</v-btn>
+      <v-spacer></v-spacer> -->
+    </v-row>
+
+    </v-col>
+
+
     <AvailabilityApplyVacation/>
   </template>
   
@@ -25,8 +46,11 @@
 <script>
   import VueCal from 'vue-cal';
   import 'vue-cal/dist/vuecal.css';
-  import AvailabilityApplyVacation from './AvailabilityApplyVacation.vue';
+  import AvailabilityApplyVacation from './AvailabilityPlanVacationsApply.vue';
   
+  import vacationsService from '@/services/VacationsService';
+import { mapState } from 'vuex';
+
   const fr = {
     "weekDays": ["1er lundi", "2e mardi", "3e mercredi", "4e jeudi", "5e vendredi", "6e samedi", "7e dimanche"],
     "weekDaysShort": ["lun", "mar", "mer", "jeu", "ven", "sam", "dim"],
@@ -50,6 +74,9 @@
       VueCal,
       AvailabilityApplyVacation
     },
+    computed:{
+      ...mapState(['session'])
+    },
     data() {
       return {
         events: [
@@ -66,9 +93,14 @@
     },
     methods: {
       toggleVacations(date) {
-        console.log("vacation toggling at : "+date);
-        const timelessDate = toTimelessDate(date)
+        if(!(date instanceof Date))
+        {
+          return
+        }
 
+        // console.log("vacation toggling at : "+date);
+        const timelessDate = toTimelessDate(date)
+        
         const eventIndex = this.getVacationEventIndex(timelessDate)
         if(eventIndex!=-1)
         {
@@ -94,7 +126,28 @@
             return i
         }
         return -1
-      }
+      },
+      async reset()
+      {
+        this.events = await vacationsService.getVacations(this.session)
+      },
+      async save()
+      {
+        await vacationsService.setVacations(this.session,this.events)
+        this.events = await vacationsService.getVacations(this.session)
+        console.log("events : "+ JSON.stringify(this.events));
+      },
+      // log()
+      // {
+      //   console.log("log button : "+JSON.stringify(this.events));
+      // }
+    },
+    async mounted()
+    {
+      // console.log("mounted")
+      const events = await vacationsService.getVacations(this.session);
+      // console.log("events : "+JSON.stringify(events));
+      this.events = events
     }
   };
 

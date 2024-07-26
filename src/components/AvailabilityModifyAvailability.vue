@@ -515,18 +515,6 @@ function compareHours(begin,end)
   return minB<minE
 }
 
-// function formatDate(date)
-// {
-//   const year = date.getUTCFullYear()
-//   const month = zeroPad((date.getUTCMonth()))
-//   const day = zeroPad(date.getUTCDate())
-//   return `${year}-${month}-${day}`
-// }
-
-// function zeroPad(value) {
-//     return value.toString().padStart(2, '0');
-// }
-
 
 </script>
 
