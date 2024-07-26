@@ -22,28 +22,25 @@
     <v-form @submit.prevent="submitForm">
       <v-col>
         <v-row>
-          <v-col cols="6">
+          <v-col cols="12" md="6">
             <v-date-picker
               class="date-picker"
               title="date de début"
-
               :locale="$i18n.locale"
               :min="minDate"
               :max="date_fin"
               v-model="date_debut"
-
               :disabled="disabled"
             ></v-date-picker>
           </v-col>
 
-          <v-col cols="6">
+          <v-col cols="12" md="6">
             <v-date-picker
               class="date-picker"
               title="date de fin"
               :locale="$i18n.locale"
               :min="date_debut"
               v-model="date_fin"
-
               :disabled="disabled"
             ></v-date-picker>
           </v-col>

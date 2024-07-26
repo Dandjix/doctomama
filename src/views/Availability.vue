@@ -4,7 +4,7 @@
 
     <v-app-bar class="toolbar">
 
-    <v-toolbar-items class="toolbar-items">
+    <!-- <v-toolbar-items class="toolbar-items">
         <v-btn 
           :class="{ 'active': selectedComponent === 'CalendarModifyAvailability' }"
           class="button-image_button"  
@@ -33,7 +33,37 @@
           <img v-bind:src="require('/src/assets/settings.png')" alt="Options" class="button-image_image"/>
         </v-btn> 
 
-    </v-toolbar-items>
+    </v-toolbar-items> -->
+
+    <v-btn-toggle>
+      <v-btn 
+          :class="{ 'active': selectedComponent === 'CalendarModifyAvailability' }"
+          class="button-image_button"  
+          @click="selectedComponent = 'CalendarModifyAvailability'" >
+
+        <img v-bind:src="require('/src/assets/disponibilites.png')" alt="Modifier mes disponibilités" class="button-image_image"/>
+        </v-btn>
+
+        <v-btn 
+          :class="{ 'active': selectedComponent === 'CalendarWeekPlanning' }"
+          class="button-image_button" 
+          @click="selectedComponent = 'CalendarWeekPlanning'">
+
+          <img v-bind:src="require('/src/assets/edt.png')" alt="Modifier mon emploi du temps par semaine" class="button-image_image"/>
+        </v-btn>
+
+        <v-btn 
+          :class="{ 'active': selectedComponent === 'CalendarPlanVacations' }"
+          class="button-image_button" @click="selectedComponent = 'CalendarPlanVacations'">
+          <img v-bind:src="require('/src/assets/vacances.png')" alt="Planifier mes vacances" class="button-image_image"/>
+        </v-btn> 
+
+        <v-btn 
+          :class="{ 'active': selectedComponent === 'AvailabilitySettings' }"
+          class="button-image_button" @click="selectedComponent = 'AvailabilitySettings'">
+          <img v-bind:src="require('/src/assets/settings.png')" alt="Options" class="button-image_image"/>
+        </v-btn> 
+    </v-btn-toggle>
   </v-app-bar>
     <div class="component-display">
       <!-- Dynamically render selected component -->
