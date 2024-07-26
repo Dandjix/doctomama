@@ -67,7 +67,7 @@
   import 'vue-cal/dist/vuecal.css';
   import AvailabilityApplyVacation from './AvailabilityPlanVacationsApply.vue';
   // import ConfirmLeaveDialog from './ConfirmLeaveDialog.vue';
-  import ChangesSnackbar from '@/components/ChangesSnackbar.vue'
+  import ChangesSnackbar from '@/components/Utility/ChangesSnackbar.vue'
   import vacationsService from '@/services/VacationsService';
   import { mapState } from 'vuex';
 

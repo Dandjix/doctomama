@@ -87,12 +87,12 @@
 <script>
 import VueCal from 'vue-cal';
 import 'vue-cal/dist/vuecal.css';
-import SettingsService from '../services/SettingsService';
+import SettingsService from '../../services/SettingsService';
 import {mapState} from 'vuex'
 import modifyDialog from './AvailabilityWeekPlanningModifyDialog'
 // import applyPatern from './AvailabilityWeekPlanningApply.vue'
 import openSpansService from '@/services/OpenSpansService';
-import stepSelector from './TimeStepSelector.vue'
+import stepSelector from '@/components/Utility/TimeStepSelector.vue'
 
 
 const fr = {

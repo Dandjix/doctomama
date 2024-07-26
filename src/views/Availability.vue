@@ -75,10 +75,10 @@
 
 <script>
 
-import CalendarModifyAvailability from '../components/AvailabilityModifyAvailability.vue';
-import CalendarPlanVacations from '../components/AvailabilityPlanVacations.vue';
-import CalendarWeekPlanning from '../components/AvailabilityWeekPlanning.vue';
-import AvailabilitySettings from '../components/AvailabilitySettings.vue'
+import CalendarModifyAvailability from '../components/Availability/AvailabilityModifyAvailability.vue';
+import CalendarPlanVacations from '../components/Availability/AvailabilityPlanVacations.vue';
+import CalendarWeekPlanning from '../components/Availability/AvailabilityWeekPlanning.vue';
+import AvailabilitySettings from '../components/Availability/AvailabilitySettings.vue'
 
 export default {
   name: 'PlannifierDisponibilites',

@@ -51,8 +51,8 @@
   
   <script>
   import { VTimePicker } from 'vuetify/labs/VTimePicker'
-  import '../services/SettingsService'
-  import SettingsService from '../services/SettingsService';
+  import '../../services/SettingsService'
+  import SettingsService from '../../services/SettingsService';
   import { mapState } from 'vuex';
   export default {
     name: 'OptionsDisponibilités',
