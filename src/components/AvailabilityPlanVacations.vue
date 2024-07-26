@@ -1,4 +1,7 @@
 <template>
+
+  <ChangesSnackbar v-model="snackbar" :message="snackbarMessage"></ChangesSnackbar>
+
     <v-col>
       <v-row>
         <v-spacer></v-spacer>
@@ -6,6 +9,11 @@
         <v-spacer></v-spacer>
       </v-row>
 
+      <v-row>
+        <v-spacer></v-spacer>
+        <v-progress-circular v-if="sending||loading" indeterminate :size="30"></v-progress-circular>
+        <v-spacer></v-spacer>
+      </v-row>
 
       <v-row>
       <vue-cal
@@ -21,9 +29,9 @@
 
     <v-row>
       <v-spacer></v-spacer>
-        <v-btn color="red" @click="reset">Réinitialiser</v-btn>
+        <v-btn color="red" @click="reset" :disabled="sending||loading">Réinitialiser</v-btn>
       <v-spacer></v-spacer>
-        <v-btn color="primary" @click="save">Sauvegarder</v-btn>
+        <v-btn color="primary" @click="save" :disabled="sending||loading">Sauvegarder</v-btn>
       <v-spacer></v-spacer>
       <!-- <v-btn color="primary" @click="log">Log</v-btn>
       <v-spacer></v-spacer> -->
@@ -34,7 +42,15 @@
       <v-divider thickness="3"></v-divider>
     </v-row>
 
-    <AvailabilityApplyVacation @vacations-changed="appliedVacations" :vacations-changed="changed"/>
+    <AvailabilityApplyVacation @vacations-changed="appliedVacations" :vacations-changed="changed" :disabled="sending||loading"/>
+
+    <!-- <ConfirmLeaveDialog
+        v-model="leaveDialog"
+        title="Attention : changements non enregistrés."
+        message="Êtes vous sûr·e de vouloir quitter la page ?"
+        @confirm="confirmLeave"
+        @cancel="cancelLeave"
+      ></ConfirmLeaveDialog> -->
   </template>
   
   <style scoped>
@@ -49,9 +65,10 @@
   import VueCal from 'vue-cal';
   import 'vue-cal/dist/vuecal.css';
   import AvailabilityApplyVacation from './AvailabilityPlanVacationsApply.vue';
-  
+  // import ConfirmLeaveDialog from './ConfirmLeaveDialog.vue';
+  import ChangesSnackbar from '@/components/ChangesSnackbar.vue'
   import vacationsService from '@/services/VacationsService';
-import { mapState } from 'vuex';
+  import { mapState } from 'vuex';
 
   const fr = {
     "weekDays": ["1er lundi", "2e mardi", "3e mercredi", "4e jeudi", "5e vendredi", "6e samedi", "7e dimanche"],
@@ -74,7 +91,9 @@ import { mapState } from 'vuex';
     name: 'Plan-Vacations',
     components: {
       VueCal,
-      AvailabilityApplyVacation
+      AvailabilityApplyVacation,
+      // ConfirmLeaveDialog
+      ChangesSnackbar
     },
     computed:{
       ...mapState(['session'])
@@ -91,7 +110,11 @@ import { mapState } from 'vuex';
           },
         ],
         fr,
-        changed:false
+        changed:false,
+        loading:true,
+        sending:false,
+        snackbar:false,
+        snackbarMessage:""
       };
     },
     methods: {
@@ -141,23 +164,41 @@ import { mapState } from 'vuex';
         await vacationsService.setVacations(this.session,this.events)
         this.events = await vacationsService.getVacations(this.session)
         this.changed = false
+
+        this.snackbarMessage = "Changements sauvegardés"
+        this.snackbar = true
       },
-      async appliedVacations()
+      async appliedVacations(mode)
       {
         // console.log("vacations applied");
+        this.sending = true
         this.events = await vacationsService.getVacations(this.session)
-      }
-      // log()
-      // {
-      //   console.log("log button : "+JSON.stringify(this.events));
-      // }
+        if(mode=="add")
+          this.snackbarMessage = "vacances appliquées"
+        else
+          this.snackbarMessage = "vacances supprimées"
+        this.snackbar = true
+        this.sending = false
+      },
+    //   handleBeforeUnload(event) {
+    //     const confirmationMessage = 'Are you sure you want to leave this page?';
+    //     event.returnValue = confirmationMessage; // Gecko, Trident, Chrome 34+
+    //     return confirmationMessage; // Gecko, WebKit, Chrome <34
+    //   }
     },
+    // beforeUnmount() {
+    //   window.removeEventListener('beforeunload', this.handleBeforeUnload);
+    // },
     async mounted()
     {
+      this.loading = true
       // console.log("mounted")
       const events = await vacationsService.getVacations(this.session);
       // console.log("events : "+JSON.stringify(events));
       this.events = events
+
+      this.loading = false
+      // window.addEventListener('beforeunload', this.handleBeforeUnload);
     }
   };
 

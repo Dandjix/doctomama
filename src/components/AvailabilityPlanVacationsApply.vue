@@ -1,8 +1,4 @@
 <template>
-  <v-card>
-
-
-
     <v-row>
       <v-spacer></v-spacer>
       <v-card-title>Ajouter ou enlever des vacances</v-card-title>
@@ -10,7 +6,12 @@
     </v-row>  
     <v-row>
       <v-spacer></v-spacer>
-      <v-btn-toggle v-model="mode" color="secondary">
+      <v-progress-circular v-if="disabled" indeterminate :size="30"></v-progress-circular>
+      <v-spacer></v-spacer>
+    </v-row>
+    <v-row>
+      <v-spacer></v-spacer>
+      <v-btn-toggle v-model="mode" color="secondary" :disabled="disabled">
         <v-btn value="add">Ajouter</v-btn>
         <v-btn value="remove">Enlever</v-btn>
       </v-btn-toggle>
@@ -31,6 +32,7 @@
               :max="date_fin"
               v-model="date_debut"
 
+              :disabled="disabled"
             ></v-date-picker>
           </v-col>
 
@@ -41,21 +43,22 @@
               :locale="$i18n.locale"
               :min="date_debut"
               v-model="date_fin"
+
+              :disabled="disabled"
             ></v-date-picker>
           </v-col>
         </v-row>
         <v-row>
           <v-spacer/>
-          <v-btn color="primary" type="submit">Appliquer</v-btn>
+          <v-btn color="primary" type="submit"  :disabled="disabled">Appliquer</v-btn>
           <v-spacer/>
         </v-row>
       </v-col>
     </v-form>
-  </v-card>
 
   <v-row>
     <v-spacer></v-spacer>
-    <v-btn-toggle v-model="mode" class="mt-10 mb-2" color="secondary">
+    <v-btn-toggle v-model="mode" class="mt-10 mb-2" color="secondary" :disabled="disabled">
       <v-btn value="add">Ajouter</v-btn>
       <v-btn value="remove">Enlever</v-btn>
     </v-btn-toggle>
@@ -78,6 +81,10 @@ export default {
     vacationsChanged:{
       type: Boolean,
       required: false,
+      default:false
+    },
+    disabled:{
+      type: Boolean,
       default:false
     }
   },
@@ -122,12 +129,8 @@ export default {
         await vacationsService.removeVacations(this.session,dates)
       }
 
-      this.$emit('vacationsChanged')
+      this.$emit('vacationsChanged',[this.mode])
     },
-    updateEvents(event) {
-      console.log(JSON.stringify(event));
-      this.$emit('update:events', event.target.value);
-    }
   },
   computed:{
     ...mapState(["session"])

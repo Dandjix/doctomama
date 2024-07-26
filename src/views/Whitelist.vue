@@ -158,6 +158,9 @@ export default {
             if(this.nbPages>0){
                 this.emails = await WhitelistService.getItems(this.session,this.page-1,this.patern)
             }
+            else{
+                this.emails = []
+            }
 
 
 
