@@ -4,9 +4,9 @@
       style="height: 600px"
       :events="events"
       @event-click="onEventClick"
-      @cell-click="onCellClick"
       class="custom-calendar"
       :locale="fr"
+
     />
   </div>
 </template>
@@ -33,7 +33,7 @@ const fr = {
 };
 
 export default {
-  name: 'CalendarComponent',
+  name: 'BookApointment',
   components: {
     VueCal
   },
@@ -46,22 +46,11 @@ export default {
   methods: {
     onEventClick(event) {
       alert(`Vous avez cliqué sur l'événement : ${event.title}, qui commence à ${event.start}`);
-    },
-    onCellClick(date) {
-      const title = prompt('Entrez le titre du rendez-vous :');
-      //if (title) {
-        // Calculate end time as 1 hour after start time
-        const endTime = new Date(date);
-        endTime.setHours(endTime.getHours() + 1);
-
-        this.events.push({
-          class: 'apointment',
-          start: date,
-          end: endTime,
-          title
-        });
-      //}
     }
+  },
+  async mounted()
+  {
+
   }
 };
 </script>

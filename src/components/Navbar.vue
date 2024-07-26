@@ -19,7 +19,7 @@
 
       </template>
       <template v-else>
-        <v-btn to="/book-rdv">Prendre rendez-vous</v-btn>
+        <v-btn to="/bookApointment">Prendre rendez-vous</v-btn>
       </template>
 
 

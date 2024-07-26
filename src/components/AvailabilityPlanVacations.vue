@@ -24,6 +24,7 @@
         @cell-click="toggleVacations"
 
         :time="false" active-view="week" :disable-views="['day']"
+        :min-date="new Date()"
       />
     </v-row>
 

@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card class="my-5 pb-5">
 
 
 
@@ -7,7 +7,7 @@
     <v-form @submit.prevent="submitForm">
       <v-col>
         <v-row>
-          <v-col cols="6">
+          <v-col cols="12" md="6">
             <v-date-picker
               class="date-picker"
               title="date de début"
@@ -20,7 +20,7 @@
             ></v-date-picker>
           </v-col>
 
-          <v-col cols="6">
+          <v-col cols="12" md="6">
             <v-date-picker
               class="date-picker"
               title="date de fin"

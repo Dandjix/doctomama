@@ -74,7 +74,7 @@
         <v-card-text>
           Définissez votre emploi du temps, qui sera appliqué à chaque nouvelle semaine au fil du temps (définissez la longueur de votre calendrier dans les options).
           <br>
-          Vous pouvez aussi appliquer cet emploi du temps à plusieurs semaines via la page modifier disponibilités (icone horloge).
+          Vous pouvez aussi appliquer cet emploi du temps à plusieurs semaines grâce au menu avec les deux dates ci-dessus.
         </v-card-text>
       </v-card>
       <v-spacer></v-spacer>

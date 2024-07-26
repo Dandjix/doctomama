@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../views/Home.vue';
-import BookRdv from '../views/BookRdv.vue';
+import BookRdv from '../views/BookApointment.vue';
 import Login from '../views/Login.vue';
 import Availability from '../views/Availability.vue'
 import Whitelist from '../views/Whitelist.vue'
@@ -19,8 +19,8 @@ const routes = [
     component: Home
   },
   {
-    path: '/book-rdv',
-    name: 'BookRdv',
+    path: '/BookApointment',
+    name: 'BookApointment',
     component: BookRdv
   },
 

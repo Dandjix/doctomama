@@ -89,13 +89,17 @@ export default {
 
   },
   data() {
-    const dateD = new Date();
-    dateD.setHours(0, 0, 0, 0);
-    const dateF = new Date(dateD)
-    dateF.setDate(dateD.getDate()+14)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const dateDebut = new Date(today);
+    const dateFin = new Date(dateDebut)
+
+    dateFin.setDate(dateDebut.getDate()+14)
     return {
-      date_debut: dateD,
-      date_fin: dateF,
+      minDate:today,
+      date_debut: dateDebut,
+      date_fin: dateFin,
       mode:"add"
     };
   },
