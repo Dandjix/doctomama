@@ -4,6 +4,8 @@ import BookRdv from '../views/BookApointment.vue';
 import Login from '../views/Login.vue';
 import Availability from '../views/Availability.vue'
 import Whitelist from '../views/Whitelist.vue'
+import ConsultationTypesGet from '@/views/ConsultationTypes/ConsultationTypesGet.vue';
+import ConsultationTypesUpdate from '@/views/ConsultationTypes/ConsultationTypesUpdate.vue';
 
 import Test from '../views/Test.vue'
 
@@ -41,11 +43,20 @@ const routes = [
     name: 'UpdateAvailability',
     component: Availability
   },
-
   {
     path: '/whitelist',
     name: 'Whitelist',
     component: Whitelist
+  },
+  {
+    path: '/consultationTypes',
+    name: 'ConsultationTypes',
+    component: ConsultationTypesGet
+  },
+  {
+    path: '/consultationTypes/update/:id',
+    name: 'ConsultationTypesUpdate',
+    component: ConsultationTypesUpdate
   },
 
   {
