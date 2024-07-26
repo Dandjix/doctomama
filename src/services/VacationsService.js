@@ -1,23 +1,46 @@
-import {getVacations as get,setVacations as set} from '../models/Vacations'
+import {getVacations,setVacations, addVacations, removeVacations} from '../models/Vacations'
 
 const vacationsService = 
 {
     async getVacations(session)
     {
-        const vacations = await get(session)
+        const vacations = await getVacations(session)
         return toEvents(vacations)
     },
     async setVacations(session,events)
     {
         try{
-            return await set(session,toVacations(events))
+            return await setVacations(session,toVacations(events))
         }
         catch(e)
         {
             console.error("error setting vacations : "+e);
             return false
         }
-    }
+    },
+    async addVacations(session,vacations)
+    {
+        // console.log("dans add");
+        try{
+            return await addVacations(session,vacations)
+        }
+        catch(e)
+        {
+            console.error("error adding vacations : "+e);
+            return false
+        }
+    },
+    async removeVacations(session,vacations)
+    {
+        try{
+            return await removeVacations(session,vacations)
+        }
+        catch(e)
+        {
+            console.error("error removing vacations : "+e);
+            return false
+        }
+    },
 }
 
 function toVacations(events)

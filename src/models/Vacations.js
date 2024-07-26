@@ -12,7 +12,21 @@ const setVacations = async (session,vacations) =>
     await axios.post(`${BASE_URL}/vacations?session=${session}`,vacations)
 }
 
+const removeVacations = async (session,vacations) =>
+{
+    // console.log("removing vacations : "+JSON.stringify(vacations));
+    await axios.delete(`${BASE_URL}/vacations?session=${session}`,{
+        data: vacations
+    })
+}
+
+const addVacations = async (session,vacations) =>
+{
+    await axios.post(`${BASE_URL}/vacations/add?session=${session}`,vacations)
+}
 export {
     getVacations,
-    setVacations
+    setVacations,
+    removeVacations,
+    addVacations,
 }

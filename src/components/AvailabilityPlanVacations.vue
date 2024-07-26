@@ -30,9 +30,11 @@
     </v-row>
 
     </v-col>
+    <v-row class="mt-10 mb-10">
+      <v-divider thickness="3"></v-divider>
+    </v-row>
 
-
-    <AvailabilityApplyVacation/>
+    <AvailabilityApplyVacation @vacations-changed="appliedVacations" :vacations-changed="changed"/>
   </template>
   
   <style scoped>
@@ -88,7 +90,8 @@ import { mapState } from 'vuex';
             class: 'leisure'
           },
         ],
-        fr
+        fr,
+        changed:false
       };
     },
     methods: {
@@ -97,6 +100,7 @@ import { mapState } from 'vuex';
         {
           return
         }
+        this.changed = true
 
         // console.log("vacation toggling at : "+date);
         const timelessDate = toTimelessDate(date)
@@ -130,13 +134,19 @@ import { mapState } from 'vuex';
       async reset()
       {
         this.events = await vacationsService.getVacations(this.session)
+        this.changed=false
       },
       async save()
       {
         await vacationsService.setVacations(this.session,this.events)
         this.events = await vacationsService.getVacations(this.session)
-        console.log("events : "+ JSON.stringify(this.events));
+        this.changed = false
       },
+      async appliedVacations()
+      {
+        // console.log("vacations applied");
+        this.events = await vacationsService.getVacations(this.session)
+      }
       // log()
       // {
       //   console.log("log button : "+JSON.stringify(this.events));
