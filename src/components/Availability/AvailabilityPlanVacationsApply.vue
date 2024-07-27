@@ -26,7 +26,7 @@
             <v-date-picker
               class="date-picker"
               title="date de début"
-              :locale="$i18n.locale"
+
               :min="minDate"
               :max="date_fin"
               v-model="date_debut"
@@ -38,7 +38,7 @@
             <v-date-picker
               class="date-picker"
               title="date de fin"
-              :locale="$i18n.locale"
+              
               :min="date_debut"
               v-model="date_fin"
               :disabled="disabled"
