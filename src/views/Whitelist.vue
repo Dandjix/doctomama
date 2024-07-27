@@ -32,22 +32,15 @@
 
     <v-pagination :length="nbPages" v-model="page" :disabled="loading"></v-pagination>
 
-    <v-dialog v-model="deletionDialog" max-width="400">
-        <v-card>
-            <v-card-title class="headline">Confirmation de la suppression</v-card-title>
-            <v-card-text>Êtes vous sûr·e de vouloir supprimer : <b>{{ emailToDelete }}</b>  de vos patient·e·s authorisé·e·s ?</v-card-text>
-            <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-checkbox label="ne plus me demander" v-model="dontAskToDelete"></v-checkbox>
-            <v-btn color="primary" text @click="abortDelete">Annuler</v-btn>
-            <v-btn color="red" text @click="confirmDelete">Supprimer</v-btn>
-            </v-card-actions>
-        </v-card>
-    </v-dialog>
+    <ConfirmDeletionDialog v-model="deletionDialog" :message="deleteMessage"
+     v-model:vmodel-dont-ask-to-delete="dontAskToDelete" @delete="confirmDelete"></ConfirmDeletionDialog>
+
 </template>
 
 <script>
 import Whitelist from '../components/Whitelist.vue'
+import ConfirmDeletionDialog from '@/components/Utility/ConfirmDeletionDialog.vue';
+
 import WhitelistService from '@/services/WhitelistService';
 import { mapState } from 'vuex';
 
@@ -55,7 +48,8 @@ export default {
     name:'Liste-des-patient·e·s-authorisé·e·s',
     components:
     {
-        Whitelist
+        Whitelist,
+        ConfirmDeletionDialog
     },
 
     methods:{
@@ -65,8 +59,11 @@ export default {
 
             if(!this.dontAskToDelete)
             {
-                this.deletionDialog=true
+
                 this.emailToDelete=email
+                this.deleteMessage = `Êtes vous sûr·e de vouloir supprimer : <b>${email}</b>  de vos patient·e·s authorisé·e·s ?`
+                this.deletionDialog=true
+                // console.log("message set");
             }
             else
             {
@@ -74,16 +71,11 @@ export default {
                 this.confirmDelete()
             }
         },
-        abortDelete(){
-            this.deletionDialog=false
-        },
         async confirmDelete(){
+            // console.log("dans confirmDelete");
             this.loading=true
             this.deletionDialog=false
 
-
-            // const index = this.emails.indexOf(this.emailToDelete)
-            // this.emails.splice(index,1)
             await WhitelistService.deleteItem(this.session,this.emailToDelete)
 
             this.nbPages = await WhitelistService.getNbPages(this.session,this.patern)
@@ -91,7 +83,7 @@ export default {
             if(this.page>this.nbPages)
                 this.page = this.nbPages;
 
-            console.log("nb pages : "+this.nbPages);
+            // console.log("nb pages : "+this.nbPages);
             if(this.nbPages>0)
             {
                 this.emails = await WhitelistService.getItems(this.session,this.page-1,this.patern)     
@@ -104,7 +96,7 @@ export default {
 
             this.loading = false
 
-            console.log("at the end !");
+            // console.log("at the end !");
         },
         async addEmail(){
 
@@ -218,6 +210,7 @@ export default {
 
             deletionDialog:false,
             dontAskToDelete:false,
+            deleteMessage:"",
             emailToDelete:"",
 
             emailToAdd:"",

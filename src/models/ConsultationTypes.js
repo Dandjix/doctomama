@@ -13,6 +13,7 @@ const getConsultationType = async (id) =>{
 }
 
 const addConsultationType = async (session,name,duration_minutes) =>{
+    // console.log(`session=${session}&name=${name}&duration_minutes=${duration_minutes}`);
     const response = await axios.post(`${BASE_URL}/consultationTypes?session=${session}&name=${name}&duration_minutes=${duration_minutes}`)
     return response.data
 }
