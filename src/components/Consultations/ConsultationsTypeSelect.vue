@@ -34,7 +34,7 @@
         },
         watch:{
             selected(newValue) {
-                console.log("changed selected to : "+JSON.stringify(newValue));
+                // console.log("changed selected to : "+JSON.stringify(newValue));
                 this.$emit('update:modelValue', newValue);
             }
         },

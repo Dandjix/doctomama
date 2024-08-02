@@ -72,8 +72,8 @@
   import { mapState } from 'vuex';
 
   const fr = {
-    "weekDays": ["1er lundi", "2e mardi", "3e mercredi", "4e jeudi", "5e vendredi", "6e samedi", "7e dimanche"],
-    "weekDaysShort": ["lun", "mar", "mer", "jeu", "ven", "sam", "dim"],
+    "weekDays": ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"],
+    "weekDaysShort": ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
     "months": ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"],
     "years": "Années",
     "year": "Année",
@@ -81,7 +81,7 @@
     "week": "Semaine",
     "day": "Jour",
     "today": "Aujourd'hui",
-    "noEvent": "Aucun événement",
+    "noEvent": "",
     "allDay": "Toute la journée",
     "deleteEvent": "Supprimer",
     "createEvent": "Créer un événement",

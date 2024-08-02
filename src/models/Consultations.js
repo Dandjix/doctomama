@@ -15,7 +15,16 @@ const getConsultations = async (session) =>
     return data
 }
 
+const getTimeSlots = async (idTypeConsult) =>
+    {
+        // console.log("dans getConsultations");
+        const {data} = await axios.get(`${BASE_URL}/consultations/timeSlots/${idTypeConsult}`)
+        // console.log("rows : "+JSON.stringify(data));
+        return data
+    }
+
 export {
     getConsultationsByEmail,
     getConsultations,
+    getTimeSlots
 }
