@@ -47,9 +47,12 @@ export default{
         },
         book()
         {
-            console.log("booking");
+            // console.log("booking : "+this.start);
+            this.$emit('book',this.start)
         }
     },
+    emits:['book']
+    ,
     props:{
         title:{
             type:String,

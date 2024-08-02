@@ -6,7 +6,11 @@
                 <h3>{{formatDate(timeSlots.date)}}</h3>
             </v-row>
             <v-row class="d-flex justify-space-between">
-                <TimeSlotItem :start="timeSlot.start" :duration="duration" v-for="timeSlot in timeSlots.timeSlots" :key="timeSlot.id"></TimeSlotItem>
+                <TimeSlotItem 
+                :start="timeSlot.start" 
+                :duration="duration" 
+                @book="book"
+                v-for="timeSlot in timeSlots.timeSlots" :key="timeSlot.id"></TimeSlotItem>
             </v-row>
         </v-container>
     </v-col>
@@ -36,6 +40,8 @@
 
             }
         },
+        emits:['book']
+        ,
         computed:{
             timeSlotsPerDay()
             {
@@ -75,6 +81,9 @@
                 
                 // Return the formatted date string
                 return `${dayOfWeek} ${day} ${month} ${year}`;
+            },
+            book(start){
+                this.$emit('book',start)
             }
         }
     }

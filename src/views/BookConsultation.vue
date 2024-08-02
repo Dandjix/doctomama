@@ -7,15 +7,29 @@
       </v-row>
       <v-divider></v-divider>
 
-      <TimeSlotsList :timeSlots="timeSlots" :duration="duration" class="mt-5"></TimeSlotsList>
+      <TimeSlotsList :timeSlots="timeSlots" 
+      :duration="duration" 
+      @book="showBookPopup"
+      class="mt-5"></TimeSlotsList>
     </v-col>
 
+    <BookConsultationDialog 
+    v-model="dialogVisible" 
+    :start="dialogStart" 
+    :consultationType="consultationType"
+    :disabled="dialogDisabled"
+    @confirmed="book">
+  </BookConsultationDialog>
+
+  <ChangesSnackbar v-model="snackbar" :message="snackbarMessage"></ChangesSnackbar>
   </div>
 </template>
 
 <script>
 import TimeSlotsList from '@/components/BookConsultation/TimeSlotsList.vue';
 import ConsultationsTypeSelect from '@/components/Consultations/ConsultationsTypeSelect.vue';
+import BookConsultationDialog from '@/components/BookConsultation/BookConsultationDialog.vue'
+import ChangesSnackbar from '@/components/Utility/ChangesSnackbar.vue';
 
 import consultationsService from '@/services/ConsultationsService';
 
@@ -23,29 +37,68 @@ export default {
   name: 'Prendre Rendez-Vous',
   components: {
     TimeSlotsList,
-    ConsultationsTypeSelect
+    ConsultationsTypeSelect,
+    BookConsultationDialog,
+    ChangesSnackbar
   },
   data(){
     return{
       timeSlots:[],
       consultationType:null,
-      duration:60
+      duration:60,
+
+      dialogVisible:false,
+      dialogDisabled:false,
+      dialogStart:null,
+
+      snackbar:false,
+      snackbarMessage:""
     }
   },
   watch:{
-    async consultationType(newValue)
+    async consultationType()
     {
-      if(!newValue || !(newValue instanceof Object))
+      this.refreshTimeSlots()
+    }
+  },
+  methods:{
+    async showBookPopup(start)
+    {
+      // console.log("ct : "+JSON.stringify(this.consultationType));
+      // console.log("booking : "+start+", "+this.consultationType.value);
+      this.dialogStart = new Date(start)
+      this.dialogVisible = true
+    },
+    async book(email,phoneNbr)
+    {
+      this.dialogDisabled = true
+
+      const start = this.dialogStart
+      const consultationType = this.consultationType.value
+
+      // console.log("booking : "+email+", "+phoneNbr);
+      // console.log("start : "+start+", ct : "+consultationType);
+      await consultationsService.createConsultation(email,phoneNbr,consultationType,start)
+      await this.refreshTimeSlots()
+      this.dialogDisabled = false
+      this.dialogVisible = false
+
+      this.snackbarMessage = "Consultation réservée avec succès"
+      this.snackbar = true
+    },
+    async refreshTimeSlots()
+    {
+      if(!this.consultationType || !(this.consultationType instanceof Object))
       {
         this.timeSlots = []
         this.duration = -1
         return
       }
-      // console.log("id : "+JSON.stringify(newValue));
-      this.duration = newValue.duration
-      this.timeSlots = await consultationsService.getTimeSlots(newValue.value)
-
-
+      // console.log("id : "+JSON.stringify(this.consultationType));
+      this.duration = this.consultationType.duration
+      this.timeSlots = await consultationsService.getTimeSlots(this.consultationType.value)
+      // console.log("time slots : "+JSON.stringify(this.timeSlots));
+      
     }
   },
   async mounted(){
