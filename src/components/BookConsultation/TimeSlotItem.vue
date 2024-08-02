@@ -5,7 +5,7 @@
             <v-card-text>de {{ startHour }} à {{ endHour }}</v-card-text>
         </v-col>
         <v-col cols="5">
-            <v-btn small color="primary" @click="">Réserver</v-btn>
+            <v-btn small color="primary" @click="book">Réserver</v-btn>
         </v-col>
     </v-row>
 </v-card>
@@ -44,6 +44,10 @@ export default{
             const h = zeroPad(time.getHours())
             const m = zeroPad(time.getMinutes())
             return `${h}:${m}`
+        },
+        book()
+        {
+            console.log("booking");
         }
     },
     props:{
