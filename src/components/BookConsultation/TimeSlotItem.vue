@@ -5,7 +5,7 @@
             <v-card-text>de {{ startHour }} à {{ endHour }}</v-card-text>
         </v-col>
         <v-col cols="5">
-            <v-btn small color="primary">Réserver</v-btn>
+            <v-btn small color="primary" @click="">Réserver</v-btn>
         </v-col>
     </v-row>
 </v-card>

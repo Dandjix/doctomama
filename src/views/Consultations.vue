@@ -1,7 +1,7 @@
 <template>
     <h1>Consultations !</h1>
     <ConsultationsCalendar :events="events"></ConsultationsCalendar>
-    <ConsultationsTypeSelect v-model="consultationType"></ConsultationsTypeSelect>
+    <ConsultationsTypeSelect v-model="consultationType" :autoSelectFirst="true"></ConsultationsTypeSelect>
     
 </template>
 

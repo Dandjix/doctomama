@@ -42,7 +42,12 @@
             modelValue:{
                 type:String,
                 required:true
+            },
+            autoSelectFirst:{
+                type:Boolean,
+                default:false
             }
+
         },
         computed:{
             selectedValue:{
@@ -77,7 +82,8 @@
                 // const selectedValue = items.find((x)=>{x.id==this.modelValue})
                 this.selected =  this.modelValue;   
 
-            } else if(items.length>0) {
+            }
+             else if(this.autoSelectFirst && items.length>0) {
                 // console.log("setting selected : "+JSON.stringify(items[0]));
                 this.selected = items[0];
                 // this.$emit('update:modelValue', items[0].value);
