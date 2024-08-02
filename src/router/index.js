@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../views/Home.vue';
-import BookRdv from '../views/BookApointment.vue';
+import BookRdv from '../views/BookConsultation.vue';
 import Login from '../views/Login.vue';
 import Availability from '../views/Availability.vue'
 import Whitelist from '../views/Whitelist.vue'
