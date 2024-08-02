@@ -6,6 +6,7 @@ import Availability from '../views/Availability.vue'
 import Whitelist from '../views/Whitelist.vue'
 import ConsultationTypesGet from '@/views/ConsultationTypes/ConsultationTypesGet.vue';
 import ConsultationTypesUpdate from '@/views/ConsultationTypes/ConsultationTypesUpdate.vue';
+import Consultations from '@/views/Consultations.vue';
 
 import Test from '../views/Test.vue'
 
@@ -57,6 +58,11 @@ const routes = [
     path: '/consultationTypes/update/:id',
     name: 'ConsultationTypesUpdate',
     component: ConsultationTypesUpdate
+  },
+  {
+    path: '/consultations',
+    name: 'Consultations',
+    component: Consultations
   },
 
   {
