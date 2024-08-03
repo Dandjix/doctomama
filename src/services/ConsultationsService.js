@@ -1,4 +1,4 @@
-import {    getConsultationsByEmail,getConsultations, getTimeSlots, createConsultation} 
+import {    getConsultationsByEmail,getConsultations,getConsultationByEmailAndId, getTimeSlots, createConsultation} 
 from '../models/Consultations'
 
 import { getConsultationType } from '@/models/ConsultationTypes';
@@ -23,6 +23,16 @@ const consultationsService = {
         }
         catch(error){
             console.error("error getting consultations by email : "+error);
+            throw error
+        }
+    },
+    async getConsultationByEmailAndId(email,id)
+    {
+        try{
+            return await getConsultationByEmailAndId(email,id)
+        }
+        catch(error){
+            console.error("error getting consultations by email and id : "+error);
             throw error
         }
     },

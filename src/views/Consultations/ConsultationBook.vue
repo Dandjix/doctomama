@@ -71,12 +71,14 @@ export default {
     },
     async book(email,phoneNbr)
     {
+      console.log("booking : "+email+", "+phoneNbr);
+      
       this.dialogDisabled = true
 
       const start = this.dialogStart
       const consultationType = this.consultationType.value
 
-      // console.log("booking : "+email+", "+phoneNbr);
+
       // console.log("start : "+start+", ct : "+consultationType);
       await consultationsService.createConsultation(email,phoneNbr,consultationType,start)
       await this.refreshTimeSlots()

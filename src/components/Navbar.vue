@@ -14,14 +14,15 @@
         <v-btn to="/whitelist">Enregistrer des patient·e·s</v-btn>
         <v-btn to="/availability">Modifier mes disponibilités</v-btn>
         <v-btn to="/consultationTypes">Modifier mes types de consultations</v-btn>
-        <v-btn to="/consultations">Voir mes rendez-vous</v-btn>
+        <v-btn to="/consultationsProvider">Voir mes rendez-vous</v-btn>
         <v-btn @click="logout">Se déconnecter</v-btn>
       </template>
       <template v-else-if="currentRoute === '/login'">
 
       </template>
       <template v-else>
-        <v-btn to="/bookApointment">Prendre rendez-vous</v-btn>
+        <v-btn to="/bookConsultation">Prendre rendez-vous</v-btn>
+        <v-btn to="/consultationsPatient">Voir mes rendez-vous</v-btn>
       </template>
 
 

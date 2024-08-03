@@ -14,11 +14,11 @@
                 <v-card-text> 
                     <v-row>
                         <v-col cols="12" md="6">
-                            <v-text-field label="adresse email" :rules="rulesEmail">
+                            <v-text-field label="adresse email" v-model="email" :rules="rulesEmail">
                             </v-text-field>
                         </v-col>
                         <v-col cols="12" md="6">
-                            <v-text-field label="numéro de téléphone" :rules="rulesPhoneNbr">
+                            <v-text-field label="numéro de téléphone" v-model="phoneNbr" :rules="rulesPhoneNbr">
                             </v-text-field>
                         </v-col>
                         <v-col cols="12" v-if="disabled">
@@ -66,11 +66,17 @@
 </style>
 
 <script>
+    import {formatTime} from '@/utils/date'
+
     export default{
         data()
         {
             return{
                 visible:this.modelValue,
+
+                email:'',
+                phoneNbr:'',
+
                 rulesEmail:[
                     email =>{
                         if(!email)
@@ -130,28 +136,14 @@
                 // console.log(valid);
                 if(!valid)
                     return
+                console.log("about to emit : "+this.email+", "+this.phoneNbr);
+                
                 this.$emit('confirmed',this.email,this.phoneNbr)
             }
         },
         computed:{
             formatedTime(){
-                const days = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
-                const months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Novembre','Décembre']
-
-                const start = new Date(this.start)
-                const end = new Date(start)
-                end.setMinutes(start.getMinutes()+this.consultationType.duration)
-                
-                const day = days[start.getDay()-1]
-                const date = start.getDate()
-                const month = months[start.getMonth()]
-                const year = start.getFullYear()
-                const startHour = `${zeroPad(start.getHours())}:${zeroPad(start.getMinutes())}`
-                const endHour = `${zeroPad(end.getHours())}:${zeroPad(end.getMinutes())}`
-
-                return `${day} ${date} ${month} ${year} de ${startHour} à ${endHour}`
-
-                // return "Lundi 18 Janvier 2024 de 08:00 à 9:00"
+                return formatTime(this.start,this.consultationType.duration)
             },
             title(){
                 // console.log(JSON.stringify(this.consultationType));
@@ -170,9 +162,5 @@
         }
     }
 
-    function zeroPad(number)
-    {
-        const res = String(number).padStart(2,'0')
-        return res
-    }
+
 </script>

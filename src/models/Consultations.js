@@ -3,8 +3,8 @@ import BASE_URL from './BASE_URL'
 
 const getConsultationsByEmail = async (email) =>
 {
-    const {rows} = await axios.get(`${BASE_URL}/consultations/${email}`)
-    return rows
+    const {data} = await axios.get(`${BASE_URL}/consultations/${email}`)
+    return data
 }
 
 const getConsultations = async (session) =>
@@ -12,6 +12,12 @@ const getConsultations = async (session) =>
     // console.log("dans getConsultations");
     const {data} = await axios.get(`${BASE_URL}/consultations?session=${session}`)
     // console.log("rows : "+JSON.stringify(data));
+    return data
+}
+
+const getConsultationByEmailAndId = async (email,id) =>
+{
+    const {data} = await axios.get(`${BASE_URL}/consultations/one?email=${email}&id=${id}`)
     return data
 }
 
@@ -40,6 +46,7 @@ const createConsultation = async (email,telephone,consultationTypeId,start) =>
 export {
     getConsultationsByEmail,
     getConsultations,
+    getConsultationByEmailAndId,
     getTimeSlots,
     createConsultation
 }

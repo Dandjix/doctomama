@@ -1,12 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../views/Home.vue';
-import BookRdv from '../views/BookConsultation.vue';
+
 import Login from '../views/Login.vue';
 import Availability from '../views/Availability.vue'
 import Whitelist from '../views/Whitelist.vue'
 import ConsultationTypesGet from '@/views/ConsultationTypes/ConsultationTypesGet.vue';
 import ConsultationTypesUpdate from '@/views/ConsultationTypes/ConsultationTypesUpdate.vue';
-import Consultations from '@/views/Consultations.vue';
+import ConsultationsProvider from '@/views/Consultations/ConsultationsProvider.vue';
+import ConsultationBook from '../views/Consultations/ConsultationBook.vue';
+import ConsultationsPatient from '@/views/Consultations/ConsultationsPatient.vue';
 
 import Test from '../views/Test.vue'
 
@@ -22,9 +24,14 @@ const routes = [
     component: Home
   },
   {
-    path: '/BookApointment',
-    name: 'BookApointment',
-    component: BookRdv
+    path: '/BookConsultation',
+    name: 'BookConsultation',
+    component: ConsultationBook
+  },
+  {
+    path: '/ConsultationsPatient',
+    name: 'ConsultationsPatient',
+    component: ConsultationsPatient
   },
 
   // partie prestataire
@@ -60,9 +67,9 @@ const routes = [
     component: ConsultationTypesUpdate
   },
   {
-    path: '/consultations',
-    name: 'Consultations',
-    component: Consultations
+    path: '/consultationsProvider',
+    name: 'ConsultationsProvider',
+    component: ConsultationsProvider
   },
 
   {
