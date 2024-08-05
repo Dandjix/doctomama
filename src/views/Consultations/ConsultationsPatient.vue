@@ -2,15 +2,15 @@
     <!-- <h1>Voir mes consultations</h1> -->
 
     <v-row class="my-5">
-        <v-col cols="4" class="d-flex align-center">
+        <v-col cols="0" lg="4" sm="2" class="d-flex align-center">
             <v-divider  color="secondary" thickness="3"></v-divider>
         </v-col>
-        <v-col cols="4">
+        <v-col cols="12" lg="4" sm="8">
             <v-sheet>
                 <v-btn to="ConsultationsPatientEmail" block color="secondary">Changer d'email ({{ email_patient }})</v-btn>
             </v-sheet>  
         </v-col>
-        <v-col cols="4" class="d-flex align-center">
+        <v-col cols="0" lg="4" sm="2" class="d-flex align-center">
             <v-divider  color="secondary" thickness="3"></v-divider>
         </v-col>
     </v-row>
@@ -29,26 +29,14 @@
     @resend="sendEmail(true)"
     @cancel="cancelDialog = false"></ConsultationCancelDialog>
 
+    <ChangesSnackbar v-model="snackbar" :message="snackbarMessage"></ChangesSnackbar>
 
-
-    <!-- <v-row class="my-5">
-        <v-col cols="4" class="d-flex align-center">
-            <v-divider  color="secondary" thickness="3"></v-divider>
-        </v-col>
-        <v-col cols="4">
-            <v-sheet>
-                <v-btn to="ConsultationsPatientEmail" block color="secondary">Changer d'email</v-btn>
-            </v-sheet>  
-        </v-col>
-        <v-col cols="4" class="d-flex align-center">
-            <v-divider  color="secondary" thickness="3"></v-divider>
-        </v-col>
-    </v-row> -->
 </template>
 
 <script>
     import ConsultationsList from '@/components/Consultations/ConsultationsList.vue'
     import ConsultationCancelDialog from './ConsultationCancelDialog.vue';
+    import ChangesSnackbar from '@/components/Utility/ChangesSnackbar.vue';
 
     import consultationsService from '@/services/ConsultationsService';
     import { mapGetters } from 'vuex';
@@ -57,7 +45,8 @@
         name:'ConsultationsPatient',
         components:{
             ConsultationsList,
-            ConsultationCancelDialog
+            ConsultationCancelDialog,
+            ChangesSnackbar
         },
         data(){
             return{
@@ -66,7 +55,10 @@
                 cancelDialog:false,
                 dialogLoading:false,
                 dialogConsult:null,
-                dialogOTPCode:''
+                dialogOTPCode:'',
+
+                snackbar:false,
+                snackbarMessage:''
             }
         },
         methods:{
@@ -76,7 +68,7 @@
                 this.dialogLoading = true
 
 
-                const consult = await consultationsService.getConsultationByEmailAndId(this.email,id)
+                const consult = await consultationsService.getConsultationByEmailAndId(this.email_patient,id)
                 this.dialogConsult = {...consult,id:id}
 
                 // console.log("consult : "+JSON.stringify(consult))
@@ -90,9 +82,9 @@
                 if(autonomous){
                     this.dialogLoading = true
                 }
-                console.log("sending email ... "+JSON.stringify(this.dialogConsult));
+                // console.log("sending email ... "+JSON.stringify(this.dialogConsult));
                 try{
-                    await consultationsService.sendCancelConsultationEmail(this.email,this.dialogConsult.id)
+                    await consultationsService.sendCancelConsultationEmail(this.email_patient,this.dialogConsult.id)
                 }
                 catch(e)
                 {
@@ -100,10 +92,21 @@
                 }
 
 
-                console.log("email sent !");
+                // console.log("email sent !");
 
                 if(autonomous){
                     this.dialogLoading = false
+                }
+            },
+            async reload()
+            {
+                try{
+                    this.consultations = await consultationsService.getConsultationsByEmail(this.email_patient)
+                }
+                catch(e)
+                {
+                    // console.error("error getting the consults of that email : "+e);
+                    this.consultations = []
                 }
             }
         },
@@ -118,20 +121,56 @@
                 this.$router.push("ConsultationsPatientEmail")
             }
                             // console.log("email changed to : "+newValue);
-            try{
-                this.consultations = await consultationsService.getConsultationsByEmail(this.email_patient)
-            }
-            catch(e)
-            {
-                // console.error("error getting the consults of that email : "+e);
-                this.consultations = []
-            }
+            await this.reload()
         },
+
         watch:{
-            async OTPCode(newValue)
+            async dialogOTPCode(newValue)
             {
-                console.log("newValue length : "+newValue.length);
-                
+                // console.log("newValue length : "+newValue.length);
+                if(newValue.length==6)
+                {
+                    // console.log("checking code : "+newValue);
+                    this.dialogLoading = true
+
+                    try{
+                        await consultationsService.cancelConsultation(this.email_patient,newValue)
+                    }
+                    catch(e){
+                        // console.log("dans le catch");
+                        
+                        
+                        this.dialogLoading = false
+
+
+
+                        // console.log("e : "+JSON.stringify(e));
+
+                        // console.log("status : "+e.response.status);
+
+                        if(e.response.status==401)
+                        {
+                            this.snackbarMessage = "mauvais code"
+                        }
+                        else
+                        {
+                            this.snackbarMessage = "erreur lors de la soumission du code"
+                        }
+                        this.snackbar = true
+
+
+                        this.dialogOTPCode = ""
+
+                        return
+                    }
+                    // console.log("en dehors du catch");
+                    await this.reload()
+                    this.dialogLoading = false
+                    this.cancelDialog = false
+
+                    this.snackbarMessage = "consultation annulée"
+                    this.snackbar = true
+                }
             }
         }
     }
