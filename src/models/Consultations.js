@@ -43,10 +43,36 @@ const createConsultation = async (email,telephone,consultationTypeId,start) =>
     await axios.post(url)
 }
 
+const sendCancelConsultationEmail = async (email,consultationId) =>
+{
+    // http://localhost:3000/consultations/cancel?email=timondubreuil@outlook.com&id=1
+
+    // console.log("sendCancelConsultationEmail : "+email+", "+consultationId);
+    
+
+    const url = `${BASE_URL}/consultations/cancel?email=${email}&id=${consultationId}`
+    
+    await axios.post(url)
+
+    // console.log("res sendCancelConsultationEmail : "+JSON.stringify(res));
+}
+
+const deleteConsultation = async (email,OTPCode) =>
+{
+    const url = `${BASE_URL}/consultations?email=${email}&OTPCode=${OTPCode}`
+    
+    await axios.delete(url)
+
+    // console.log("res deleteConsultation : "+JSON.stringify(res));
+}
+
 export {
     getConsultationsByEmail,
     getConsultations,
     getConsultationByEmailAndId,
     getTimeSlots,
-    createConsultation
+    createConsultation,
+
+    sendCancelConsultationEmail,
+    deleteConsultation
 }

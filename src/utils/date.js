@@ -6,7 +6,7 @@ export function formatTime(startTime,duration){
     const end = new Date(startTime)
     end.setMinutes(start.getMinutes()+duration)
     
-    const day = days[start.getDay()-1]
+    const day = days[modulo(start.getDay()-1,7)]
     const date = start.getDate()
     const month = months[start.getMonth()]
     const year = start.getFullYear()
@@ -21,5 +21,15 @@ export function formatTime(startTime,duration){
 function zeroPad(number)
 {
     const res = String(number).padStart(2,'0')
+    return res
+}
+
+function modulo(x,modulo)
+{
+    var res = x%modulo
+    if(res<0)
+        res+=modulo
+    if(res>=modulo)
+        res -= modulo
     return res
 }

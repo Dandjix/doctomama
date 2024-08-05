@@ -15,21 +15,33 @@
             <v-card-text>
                 (Ceci est nécessaire afin que seulement vous puissiez annuler vos rendez-vous)
             </v-card-text>
+
+
             <v-row>
                 <v-spacer></v-spacer>
-                <v-btn color="primary" width="200" @click="resend" :disabled="loading">Renvoyer</v-btn>
+                <v-col cols="8">
+                    <v-progress-linear color="primary" v-if="cooldown>0" :model-value="(cooldown*100)/cooldown_max"></v-progress-linear>
+                </v-col>
                 <v-spacer></v-spacer>
             </v-row>
 
             <v-row>
                 <v-spacer></v-spacer>
-                <v-progress-circular indeterminate v-if="loading"></v-progress-circular>
+                <v-btn color="primary" width="200" @click="resend" :disabled="loading||cooldown>0">Renvoyer</v-btn>
+                <v-spacer></v-spacer>
+            </v-row>
+
+
+
+            <v-row>
+                <v-spacer></v-spacer>
+                <v-progress-circular indeterminate v-if="loading" :model-value="cooldown"></v-progress-circular>
                 <v-spacer></v-spacer>
             </v-row>
 
 
             <v-card-actions>
-                <v-btn color="red" @click="cancel" :disabled="loading">Revenir en arrière</v-btn>
+                <v-btn color="error" @click="cancel" :disabled="loading">Revenir en arrière</v-btn>
             </v-card-actions>
 
         </v-card>
@@ -45,6 +57,10 @@
             modelValue:{
                 type:Boolean,
                 required:true
+            },
+            OTPCode:{
+                type:String,
+                default:''
             },
             email:{
                 type:String,
@@ -62,14 +78,27 @@
         data(){
             return{
                 visible:this.modelValue,
-                code:''
+                code:'',
+                cooldown_max : 21,
+                cooldown : 0
             }
         },
         emits:['resend','cancel'],
         methods:{
+            startCooldown() {
+                this.cooldown = this.cooldown_max;
+                this.cooldownInterval = setInterval(() => {
+                    if (this.cooldown > 0) {
+                        this.cooldown -= 1;
+                    } else {
+                        clearInterval(this.cooldownInterval);
+                    }
+                }, 1000); // Decrease cooldown every 1 second
+            },
             resend()
             {
                 this.$emit('resend')
+                this.startCooldown()
             },
             cancel()
             {
@@ -80,10 +109,20 @@
             visible(newValue)
             {
                 this.$emit('update:modelValue',newValue)
+                if(newValue)
+                    this.startCooldown()
             },
             modelValue(newValue) 
             {
                 this.visible = newValue;
+            },
+            code(newValue)
+            {
+                this.$emit('update:OTPCode',newValue)
+            },
+            OTPCode(newValue) 
+            {
+                this.code = newValue;
             }
         },
         computed:{

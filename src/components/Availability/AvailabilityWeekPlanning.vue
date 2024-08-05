@@ -50,7 +50,7 @@
     <v-row>
       <v-spacer/>
       <v-spacer/>
-      <v-btn color="red" :disabled="sending||loading" @click="empty">Vider</v-btn>
+      <v-btn color="error" :disabled="sending||loading" @click="empty">Vider</v-btn>
       <v-spacer/>
       <v-btn color="yellow" :disabled="sending||loading||!changed" @click="reset">Réinitialiser</v-btn>
       <v-spacer/>

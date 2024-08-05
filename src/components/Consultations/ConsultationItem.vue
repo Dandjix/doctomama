@@ -6,7 +6,7 @@
                 <v-card-text>{{ formatedTime }}</v-card-text>
             </v-col>
             <v-col cols="4">
-                <v-btn color="red" @click="cancel">Annuler</v-btn>
+                <v-btn color="error" @click="cancel">Annuler</v-btn>
             </v-col>
 
         </v-row>

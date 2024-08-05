@@ -30,7 +30,7 @@
 
     <v-row>
       <v-spacer></v-spacer>
-        <v-btn color="red" @click="reset" :disabled="sending||loading||!changed">Réinitialiser</v-btn>
+        <v-btn color="error" @click="reset" :disabled="sending||loading||!changed">Réinitialiser</v-btn>
       <v-spacer></v-spacer>
         <v-btn color="primary" @click="save" :disabled="sending||loading||!changed">Sauvegarder</v-btn>
       <v-spacer></v-spacer>

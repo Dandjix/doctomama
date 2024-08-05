@@ -29,7 +29,7 @@
                 <v-spacer/>
                 <v-spacer/>
                 <v-spacer/>
-                <v-btn @click="deleteEvent" color="red">Supprimer</v-btn>
+                <v-btn @click="deleteEvent" color="error">Supprimer</v-btn>
                 <v-spacer/>
                 <v-btn @click="save" color="primary">Enregistrer</v-btn>
                 <v-spacer/>

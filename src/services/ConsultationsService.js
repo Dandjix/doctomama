@@ -1,4 +1,13 @@
-import {    getConsultationsByEmail,getConsultations,getConsultationByEmailAndId, getTimeSlots, createConsultation} 
+import {    
+    getConsultationsByEmail,
+    getConsultations,
+    getConsultationByEmailAndId,
+    createConsultation,
+
+    sendCancelConsultationEmail,
+    deleteConsultation,
+    
+    getTimeSlots} 
 from '../models/Consultations'
 
 import { getConsultationType } from '@/models/ConsultationTypes';
@@ -18,28 +27,28 @@ const consultationsService = {
     },
     async getConsultationsByEmail(email)
     {
-        try{
+        // try{
             return await getConsultationsByEmail(email)
-        }
-        catch(error){
-            console.error("error getting consultations by email : "+error);
-            throw error
-        }
+        // }
+        // catch(error){
+        //     // console.error("error getting consultations by email : "+error);
+        //     throw error
+        // }
     },
     async getConsultationByEmailAndId(email,id)
     {
-        try{
+        // try{
             return await getConsultationByEmailAndId(email,id)
-        }
-        catch(error){
-            console.error("error getting consultations by email and id : "+error);
-            throw error
-        }
+        // }
+        // catch(error){
+        //     // console.error("error getting consultations by email and id : "+error);
+        //     throw error
+        // }
     },
     async createConsultation(email,telephone,consultationTypeId,start)
     {
         try{
-            console.log("start to send : "+JSON.stringify(start));
+            // console.log("start to send : "+JSON.stringify(start));
             
             return await createConsultation(email,telephone,consultationTypeId,start)
         }
@@ -47,6 +56,33 @@ const consultationsService = {
             console.error("could not create consultation : "+e);
             throw e
         }
+    },
+    async sendCancelConsultationEmail(email,consultationId)
+    {
+        try
+        {
+            console.log("email : "+email+", id : "+consultationId);
+            
+            return await sendCancelConsultationEmail(email,consultationId)
+        }
+        catch(e)
+        {
+            console.error("error sending email : "+e);
+            throw e
+        }
+
+    },
+    async cancelConsultation(email,OTPCode)
+    {
+        try{
+            return await deleteConsultation(email,OTPCode)
+        }
+        catch(e)
+        {
+            console.error("error canceling consultation : "+e);
+            throw e
+        }
+
     },
     async getTimeSlots(typeConsultationId)
     {

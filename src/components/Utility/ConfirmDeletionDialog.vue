@@ -7,7 +7,7 @@
             <v-spacer></v-spacer>
             <v-checkbox label="ne plus me demander" v-model="dontAskToDelete"></v-checkbox>
             <v-btn color="primary" text @click="abortDelete">Annuler</v-btn>
-            <v-btn color="red" text @click="confirmDelete">Supprimer</v-btn>
+            <v-btn color="error" text @click="confirmDelete">Supprimer</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>

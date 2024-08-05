@@ -21,7 +21,7 @@
                     <v-btn color="secondary" :to="'/consultationTypes/update/'+consult.id" :disabled="disabledValue">Modifier</v-btn>
                 </td>
                 <td>
-                    <v-btn color="red" @click="deleteTypeConsultation(consult.id,consult.nom)" :disabled="disabledValue">Supprimer</v-btn>
+                    <v-btn color="error" @click="deleteTypeConsultation(consult.id,consult.nom)" :disabled="disabledValue">Supprimer</v-btn>
                 </td>
             </tr>
         </tbody>

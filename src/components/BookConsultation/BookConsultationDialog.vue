@@ -38,7 +38,7 @@
                     <v-btn
                     text="Annuler"
                     @click="visible = false"
-                    color="red"
+                    color="error"
                     :disabled="disabled"
                     ></v-btn>
 

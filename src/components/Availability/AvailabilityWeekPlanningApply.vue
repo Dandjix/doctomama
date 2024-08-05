@@ -50,7 +50,7 @@
       </v-card-text>
       <v-row>
         <v-spacer/>
-        <v-btn color="red" @click="deleteUnsavedChanges">Supprimer les changements et appliquer le planning</v-btn>
+        <v-btn color="error" @click="deleteUnsavedChanges">Supprimer les changements et appliquer le planning</v-btn>
         <v-spacer/>
       </v-row>
       <v-row>

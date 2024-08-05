@@ -3,11 +3,13 @@
     <EmailSearch v-model="email"></EmailSearch>
     <ConsultationsList :consultations="consultations" @cancel="startCancel"></ConsultationsList>
     <ConsultationCancelDialog 
-    v-model="cancelDialog" 
+    v-model="cancelDialog"
+    v-model:OTPCode="dialogOTPCode"
+
     :email="email" 
     :loading="dialogLoading" 
     :consult="dialogConsult"
-    @resend="sendEmail"
+    @resend="sendEmail(true)"
     @cancel="cancelDialog = false"></ConsultationCancelDialog>
 </template>
 
@@ -32,7 +34,8 @@
 
                 cancelDialog:false,
                 dialogLoading:false,
-                dialogConsult:null
+                dialogConsult:null,
+                dialogOTPCode:''
             }
         },
         methods:{
@@ -43,23 +46,53 @@
 
 
                 const consult = await consultationsService.getConsultationByEmailAndId(this.email,id)
-                this.dialogConsult = consult
+                this.dialogConsult = {...consult,id:id}
 
-                console.log("consult : "+JSON.stringify(consult))
+                // console.log("consult : "+JSON.stringify(consult))
+
+                await this.sendEmail(false)
 
                 this.dialogLoading = false
             },
-            async sendEmail()
+            async sendEmail(autonomous=false)
             {
+                if(autonomous){
+                    this.dialogLoading = true
+                }
+                console.log("sending email ... "+JSON.stringify(this.dialogConsult));
+                try{
+                    await consultationsService.sendCancelConsultationEmail(this.email,this.dialogConsult.id)
+                }
+                catch(e)
+                {
+                    alert(e)
+                }
 
+
+                console.log("email sent !");
+
+                if(autonomous){
+                    this.dialogLoading = false
+                }
             }
         },  
         watch:{
             async email(newValue)
             {
-                this.consultations = await consultationsService.getConsultationsByEmail(newValue)
-
-                // console.log("email changed to : "+newValue+" nb c : "+JSON.stringify(this.consultations));
+                // console.log("email changed to : "+newValue);
+                try{
+                    this.consultations = await consultationsService.getConsultationsByEmail(newValue)
+                }
+                catch(e)
+                {
+                    // console.error("error getting the consults of that email : "+e);
+                    this.consultations = []
+                }
+            },
+            async OTPCode(newValue)
+            {
+                console.log("newValue length : "+newValue.length);
+                
             }
         }
     }
