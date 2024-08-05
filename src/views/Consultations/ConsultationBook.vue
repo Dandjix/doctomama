@@ -32,6 +32,7 @@ import BookConsultationDialog from '@/components/BookConsultation/BookConsultati
 import ChangesSnackbar from '@/components/Utility/ChangesSnackbar.vue';
 
 import consultationsService from '@/services/ConsultationsService';
+import { mapActions } from 'vuex';
 
 export default {
   name: 'Prendre Rendez-Vous',
@@ -62,6 +63,7 @@ export default {
     }
   },
   methods:{
+    ...mapActions(['setPatientEmail']),
     async showBookPopup(start)
     {
       // console.log("ct : "+JSON.stringify(this.consultationType));
@@ -71,7 +73,7 @@ export default {
     },
     async book(email,phoneNbr)
     {
-      console.log("booking : "+email+", "+phoneNbr);
+      // console.log("booking : "+email+", "+phoneNbr);
       
       this.dialogDisabled = true
 
@@ -87,6 +89,8 @@ export default {
 
       this.snackbarMessage = "Consultation réservée avec succès"
       this.snackbar = true
+
+      this.setPatientEmail(email)
     },
     async refreshTimeSlots()
     {

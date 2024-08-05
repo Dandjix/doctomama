@@ -67,7 +67,7 @@
 
 <script>
     import {formatTime} from '@/utils/date'
-
+    import WhitelistService from '@/services/WhitelistService';
     export default{
         data()
         {
@@ -92,6 +92,11 @@
                         // console.log("in rules. Valid ? "+isValid);
                         if(isValid) return true
                         return 'email invalide'
+                    },
+                    async email =>{
+                        const whitelisted = await WhitelistService.check(email)
+                        if(whitelisted) return true
+                        return "cet email n'a pas été authorisé"
                     }
                 ],
                 rulesPhoneNbr:[

@@ -48,7 +48,7 @@ const WhitelistService = {
     try{
       // console.log("wl : "+await check(email));
       const wl = await check(email)
-      console.log("wl : "+wl);
+      // console.log("wl : "+wl);
       
       return wl
     }

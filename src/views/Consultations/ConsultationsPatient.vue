@@ -1,13 +1,22 @@
 <template>
     <!-- <h1>Voir mes consultations</h1> -->
 
-    <v-row>
-        <v-spacer></v-spacer>
-        <v-col cols="4">
-            <v-btn to="ConsultationsPatientEmail">Changer d'email</v-btn>
+    <v-row class="my-5">
+        <v-col cols="4" class="d-flex align-center">
+            <v-divider  color="secondary" thickness="3"></v-divider>
         </v-col>
-        <v-spacer></v-spacer>
+        <v-col cols="4">
+            <v-sheet>
+                <v-btn to="ConsultationsPatientEmail" block color="secondary">Changer d'email ({{ email_patient }})</v-btn>
+            </v-sheet>  
+        </v-col>
+        <v-col cols="4" class="d-flex align-center">
+            <v-divider  color="secondary" thickness="3"></v-divider>
+        </v-col>
     </v-row>
+
+
+
 
     <ConsultationsList :consultations="consultations" @cancel="startCancel"></ConsultationsList>
     <ConsultationCancelDialog 
@@ -19,6 +28,22 @@
     :consult="dialogConsult"
     @resend="sendEmail(true)"
     @cancel="cancelDialog = false"></ConsultationCancelDialog>
+
+
+
+    <!-- <v-row class="my-5">
+        <v-col cols="4" class="d-flex align-center">
+            <v-divider  color="secondary" thickness="3"></v-divider>
+        </v-col>
+        <v-col cols="4">
+            <v-sheet>
+                <v-btn to="ConsultationsPatientEmail" block color="secondary">Changer d'email</v-btn>
+            </v-sheet>  
+        </v-col>
+        <v-col cols="4" class="d-flex align-center">
+            <v-divider  color="secondary" thickness="3"></v-divider>
+        </v-col>
+    </v-row> -->
 </template>
 
 <script>
@@ -36,7 +61,6 @@
         },
         data(){
             return{
-                email:'',
                 consultations:[],
 
                 cancelDialog:false,
