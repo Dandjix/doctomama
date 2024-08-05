@@ -88,7 +88,7 @@
             startCooldown() {
                 this.cooldown = this.cooldown_max;
                 this.cooldownInterval = setInterval(() => {
-                    console.log("cooldown : "+this.cooldown);
+                    // console.log("cooldown : "+this.cooldown);
                     
                     if (this.cooldown > 0) {
                         this.cooldown -= 1;
