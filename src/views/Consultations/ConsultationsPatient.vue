@@ -1,6 +1,14 @@
 <template>
-    <h1>Voir mes consultations</h1>
-    <EmailSearch v-model="email"></EmailSearch>
+    <!-- <h1>Voir mes consultations</h1> -->
+
+    <v-row>
+        <v-spacer></v-spacer>
+        <v-col cols="4">
+            <v-btn to="ConsultationsPatientEmail">Changer d'email</v-btn>
+        </v-col>
+        <v-spacer></v-spacer>
+    </v-row>
+
     <ConsultationsList :consultations="consultations" @cancel="startCancel"></ConsultationsList>
     <ConsultationCancelDialog 
     v-model="cancelDialog"
@@ -15,16 +23,15 @@
 
 <script>
     import ConsultationsList from '@/components/Consultations/ConsultationsList.vue'
-    import EmailSearch from '@/components/Consultations/EmailSearch.vue';
     import ConsultationCancelDialog from './ConsultationCancelDialog.vue';
 
     import consultationsService from '@/services/ConsultationsService';
+    import { mapGetters } from 'vuex';
 
     export default{
         name:'ConsultationsPatient',
         components:{
             ConsultationsList,
-            EmailSearch,
             ConsultationCancelDialog
         },
         data(){
@@ -75,20 +82,28 @@
                     this.dialogLoading = false
                 }
             }
-        },  
-        watch:{
-            async email(newValue)
+        },
+        computed:{
+            ...mapGetters(['email_patient'])
+        },
+        async mounted()
+        {
+            if(this.email_patient=="")
             {
-                // console.log("email changed to : "+newValue);
-                try{
-                    this.consultations = await consultationsService.getConsultationsByEmail(newValue)
-                }
-                catch(e)
-                {
-                    // console.error("error getting the consults of that email : "+e);
-                    this.consultations = []
-                }
-            },
+                // console.log("no email loaded, redirecting to ConsultationsPatientEmail")   
+                this.$router.push("ConsultationsPatientEmail")
+            }
+                            // console.log("email changed to : "+newValue);
+            try{
+                this.consultations = await consultationsService.getConsultationsByEmail(this.email_patient)
+            }
+            catch(e)
+            {
+                // console.error("error getting the consults of that email : "+e);
+                this.consultations = []
+            }
+        },
+        watch:{
             async OTPCode(newValue)
             {
                 console.log("newValue length : "+newValue.length);

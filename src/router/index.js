@@ -6,13 +6,16 @@ import Availability from '../views/Availability.vue'
 import Whitelist from '../views/Whitelist.vue'
 import ConsultationTypesGet from '@/views/ConsultationTypes/ConsultationTypesGet.vue';
 import ConsultationTypesUpdate from '@/views/ConsultationTypes/ConsultationTypesUpdate.vue';
+
 import ConsultationsProvider from '@/views/Consultations/ConsultationsProvider.vue';
 import ConsultationBook from '../views/Consultations/ConsultationBook.vue';
 import ConsultationsPatient from '@/views/Consultations/ConsultationsPatient.vue';
+import ConsultationsPatientEnterEmail from '@/views/Consultations/ConsultationsPatientEnterEmail.vue';
 
 import Test from '../views/Test.vue'
 
 import NotFound from '../views/NotFound.vue';
+
 
 const routes = [
 
@@ -27,6 +30,11 @@ const routes = [
     path: '/BookConsultation',
     name: 'BookConsultation',
     component: ConsultationBook
+  },
+  {
+    path: '/ConsultationsPatientEmail',
+    name: 'ConsultationsPatientEmail',
+    component: ConsultationsPatientEnterEmail
   },
   {
     path: '/ConsultationsPatient',

@@ -7,18 +7,23 @@ export default new Vuex.Store({
     session: Cookies.get('session') || '',
     isLoggedIn: !!Cookies.get('session'),
     heure_debut_calendrier:"00:00",
-    heure_fin_calendrier:"00:00"
+    heure_fin_calendrier:"00:00",
+
+    email_patient:""
   },
   mutations: {
-    setSession(state, session) {
+    SET_SESSION(state, session) {
       state.session = session;
       state.isLoggedIn = true;
       Cookies.set('session', session,'3h'); // Set cookie
     },
-    clearSession(state) {
+    CLEAR_SESSION(state) {
       state.session = '';
       state.isLoggedIn = false;
       Cookies.remove('session'); // Remove cookie
+    },
+    SET_PATIENT_EMAIL(state,email){
+      state.email_patient = email;
     }
   },
   actions: {
@@ -26,7 +31,7 @@ export default new Vuex.Store({
       try {
         const { session, success } = await LoginService.login(password);
         if (success) {
-          commit('setSession', session);
+          commit('SET_SESSION', session);
         }
         return success;
       } catch (error) {
@@ -39,7 +44,7 @@ export default new Vuex.Store({
         // console.log("about to logout");
         const session = state.session
         await LoginService.logout(session)
-        commit('clearSession');
+        commit('CLEAR_SESSION');
       } catch (error) {
         console.error('Error during logout:', error);
       }
@@ -48,14 +53,18 @@ export default new Vuex.Store({
 
       const session = Cookies.get('session');
       if (session) {
-        commit('setSession', session);
+        commit('SET_SESSION', session);
       } else {
-        commit('clearSession');
+        commit('CLEAR_SESSION');
       }
+    },
+    setPatientEmail({commit},newEmail) {
+      commit('SET_PATIENT_EMAIL',newEmail)
     }
   },
   getters: {
     isLoggedIn: state => state.isLoggedIn,
     session: state => state.session,
+    email_patient:state =>state.email_patient
   }
 });

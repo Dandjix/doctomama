@@ -38,10 +38,23 @@ const deleteItem = async(session,email) => {
     }
 }
 
+const check = async(email) => {
+    try{
+        const res = await axios.get(`${BASE_URL}/whitelist/check?email=${email}`); 
+        // console.log("res : "+JSON.stringify(res));
+        return res.data
+        
+    }
+    catch(error){
+        throw Error('Error while checking if email in whitelist')
+    }
+}
+
 export
 {
     getItems,
     getNbPages,
     addItem,
-    deleteItem
+    deleteItem,
+    check
 }
