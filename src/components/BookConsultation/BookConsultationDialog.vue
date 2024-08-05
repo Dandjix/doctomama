@@ -142,7 +142,7 @@ import { mapGetters } from 'vuex';
                 // console.log(valid);
                 if(!valid)
                     return
-                console.log("about to emit : "+this.email+", "+this.phoneNbr);
+                // console.log("about to emit : "+this.email+", "+this.phoneNbr);
                 
                 this.$emit('confirmed',this.email,this.phoneNbr)
             }

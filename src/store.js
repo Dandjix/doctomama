@@ -75,6 +75,6 @@ export default new Vuex.Store({
     session: state => state.session,
 
     email_patient:state =>state.email_patient,
-    email_telephone:state =>state.email_telephone
+    telephone_patient:state =>state.telephone_patient
   }
 });
