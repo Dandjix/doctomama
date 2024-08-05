@@ -1,17 +1,26 @@
 <template>
   <div>
-    <h1>Prendre rendez-vous</h1>
+    <!-- <h1>Prendre rendez-vous</h1> -->
     <v-col>
-      <v-row cols="6" class="mb-5">
-        <ConsultationsTypeSelect v-model="consultationType"></ConsultationsTypeSelect>
+
+      <v-row>
+        <v-spacer></v-spacer>
+        <v-sheet  class="my-5" width="500">
+          <ConsultationsTypeSelect v-model="consultationType"></ConsultationsTypeSelect>
+        </v-sheet>
+        <v-spacer></v-spacer>
       </v-row>
+
+
+
+
       <v-divider></v-divider>
 
       <TimeSlotsList :timeSlots="timeSlots" 
-      :duration="duration" 
-      @book="showBookPopup"
-      class="mt-5"></TimeSlotsList>
-    </v-col>
+        :duration="duration" 
+        @book="showBookPopup"
+        class="mt-5"></TimeSlotsList>
+      </v-col>
 
     <BookConsultationDialog 
     v-model="dialogVisible" 
@@ -32,7 +41,7 @@ import BookConsultationDialog from '@/components/BookConsultation/BookConsultati
 import ChangesSnackbar from '@/components/Utility/ChangesSnackbar.vue';
 
 import consultationsService from '@/services/ConsultationsService';
-import { mapActions } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
   name: 'Prendre Rendez-Vous',
@@ -62,8 +71,11 @@ export default {
       this.refreshTimeSlots()
     }
   },
+  computed:{
+    ...mapGetters(['email_patient','telephone_patient'])
+  },
   methods:{
-    ...mapActions(['setPatientEmail']),
+    ...mapActions(['setPatientEmail','setPatientTelephone']),
     async showBookPopup(start)
     {
       // console.log("ct : "+JSON.stringify(this.consultationType));
@@ -91,6 +103,7 @@ export default {
       this.snackbar = true
 
       this.setPatientEmail(email)
+      this.setPatientTelephone(phoneNbr)
     },
     async refreshTimeSlots()
     {

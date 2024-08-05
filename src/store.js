@@ -9,7 +9,8 @@ export default new Vuex.Store({
     heure_debut_calendrier:"00:00",
     heure_fin_calendrier:"00:00",
 
-    email_patient:""
+    email_patient:"",
+    telephone_patient:""
   },
   mutations: {
     SET_SESSION(state, session) {
@@ -24,6 +25,9 @@ export default new Vuex.Store({
     },
     SET_PATIENT_EMAIL(state,email){
       state.email_patient = email;
+    },
+    SET_PATIENT_TELEPHONE(state,telephone){
+      state.telephone_patient = telephone;
     }
   },
   actions: {
@@ -58,13 +62,19 @@ export default new Vuex.Store({
         commit('CLEAR_SESSION');
       }
     },
+
     setPatientEmail({commit},newEmail) {
       commit('SET_PATIENT_EMAIL',newEmail)
+    },
+    setPatientTelephone({commit},newTelephone) {
+      commit('SET_PATIENT_TELEPHONE',newTelephone)
     }
   },
   getters: {
     isLoggedIn: state => state.isLoggedIn,
     session: state => state.session,
-    email_patient:state =>state.email_patient
+
+    email_patient:state =>state.email_patient,
+    email_telephone:state =>state.email_telephone
   }
 });

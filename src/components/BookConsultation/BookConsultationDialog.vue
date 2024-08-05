@@ -68,6 +68,7 @@
 <script>
     import {formatTime} from '@/utils/date'
     import WhitelistService from '@/services/WhitelistService';
+import { mapGetters } from 'vuex';
     export default{
         data()
         {
@@ -147,6 +148,7 @@
             }
         },
         computed:{
+            ...mapGetters(['email_patient','telephone_patient']),
             formatedTime(){
                 return formatTime(this.start,this.consultationType.duration)
             },
@@ -164,6 +166,11 @@
             visible(newValue){
                 this.$emit('update:modelValue',newValue)
             }
+        },
+        mounted()
+        {
+            this.phoneNbr = this.telephone_patient
+            this.email = this.email_patient
         }
     }
 

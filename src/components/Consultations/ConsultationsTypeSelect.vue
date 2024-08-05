@@ -2,7 +2,7 @@
     <v-combobox 
         :items="items"
         label="Type de consultation"
-
+        color="primary"
         v-model="selected"
 
     ></v-combobox>
