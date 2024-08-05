@@ -23,6 +23,8 @@
     v-model="cancelDialog"
     v-model:OTPCode="dialogOTPCode"
 
+    ref="cancelDialog"
+
     :email="email" 
     :loading="dialogLoading" 
     :consult="dialogConsult"
@@ -75,6 +77,8 @@
 
                 await this.sendEmail(false)
 
+                // this.$refs.cancelDialog.startCooldown()
+
                 this.dialogLoading = false
             },
             async sendEmail(autonomous=false)
@@ -85,6 +89,7 @@
                 // console.log("sending email ... "+JSON.stringify(this.dialogConsult));
                 try{
                     await consultationsService.sendCancelConsultationEmail(this.email_patient,this.dialogConsult.id)
+                    this.$refs.cancelDialog.startCooldown()
                 }
                 catch(e)
                 {

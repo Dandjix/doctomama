@@ -88,6 +88,8 @@
             startCooldown() {
                 this.cooldown = this.cooldown_max;
                 this.cooldownInterval = setInterval(() => {
+                    console.log("cooldown : "+this.cooldown);
+                    
                     if (this.cooldown > 0) {
                         this.cooldown -= 1;
                     } else {
@@ -98,7 +100,7 @@
             resend()
             {
                 this.$emit('resend')
-                this.startCooldown()
+                // this.startCooldown()
             },
             cancel()
             {
@@ -109,8 +111,8 @@
             visible(newValue)
             {
                 this.$emit('update:modelValue',newValue)
-                if(newValue)
-                    this.startCooldown()
+                // if(newValue)
+                //     this.startCooldown()
             },
             modelValue(newValue) 
             {
