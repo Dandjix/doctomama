@@ -2,6 +2,7 @@ import {
     getConsultationsByEmail,
     getConsultations,
     getConsultationByEmailAndId,
+    getConsultationById,
     createConsultation,
 
     sendCancelConsultationEmail,
@@ -45,6 +46,10 @@ const consultationsService = {
         //     throw error
         // }
     },
+    async getConsultationById(session,id)
+    {
+        return await getConsultationById(session,id)
+    },
     async createConsultation(email,telephone,consultationTypeId,start)
     {
         try{
@@ -72,10 +77,10 @@ const consultationsService = {
         }
 
     },
-    async cancelConsultation(email,OTPCode)
+    async cancelConsultation(email,OTPCode,id)
     {
         try{
-            return await deleteConsultation(email,OTPCode)
+            return await deleteConsultation(email,OTPCode,id)
         }
         catch(e)
         {
@@ -105,6 +110,8 @@ function toConsultationEvents(consultations)
 
     const events = consultations.map((consult)=>
     {
+        // console.log("consult : "+JSON.stringify(consult));
+        
         const debut = new Date(consult.debut)
         const fin = new Date(debut)
         fin.setMinutes(fin.getMinutes()+consult.duree_minutes)

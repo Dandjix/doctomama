@@ -1,12 +1,21 @@
 <template>
     <h1>Consultations !</h1>
-    <ConsultationsCalendar :events="events"></ConsultationsCalendar>
-    <ConsultationsTypeSelect v-model="consultationType" :autoSelectFirst="true"></ConsultationsTypeSelect>
+    <v-row>
+        <v-spacer></v-spacer>
+        <v-col>
+            <v-sheet width="500">
+                <ConsultationsTypeSelect v-model="consultationType" clearable></ConsultationsTypeSelect>
+            </v-sheet>
+        </v-col>
+        <v-spacer></v-spacer>
+    </v-row>
+    <ConsultationsCalendar @consultationClick="consultationClicked" :events="events"></ConsultationsCalendar>
+
     
 </template>
 
 <script>
-    import ConsultationsCalendar from '@/components/Consultations/ConsultationsCalendar.vue';
+    import ConsultationsCalendar from '@/components/ConsultationsProvider/ConsultationsCalendar.vue';
     import ConsultationsTypeSelect from '@/components/Consultations/ConsultationsTypeSelect.vue';
 
     import ConsultationsService from '@/services/ConsultationsService';
@@ -26,7 +35,7 @@
         },
         watch:{
             async consultationType(newValue){
-                console.log("new value for consultation Type : "+JSON.stringify(newValue));
+                // console.log("new value for consultation Type : "+JSON.stringify(newValue));
                 var timeSlots;
                 // console.log("type : "+!(newValue instanceof Object));
                 if(!newValue || !(newValue instanceof Object)){
@@ -69,20 +78,14 @@
            const consults = await ConsultationsService.getAllConsultations(this.session)
 
            this.events = consults
-
-            //    console.log("consults : "+JSON.stringify(consults));
-        //     this.events = consults
-
-        //     const fin = new Date()
-        //     fin.setHours(fin.getHours()+2)
-
-        //     this.events = [
-        //         {id:1,
-        //         title:"consult 1 : lorent.dech@outlook.com",
-        //         start:new Date(),
-        //         end:fin,
-        //         eventType:"consultation",
-        //         class:"consultation"}]
+        },
+        methods:{
+            async consultationClicked(id)
+            {
+                const consultation = {...(await ConsultationsService.getConsultationById(this.session,id)),id:id}
+                console.log("start : "+JSON.stringify(consultation));
+                
+            }
         }
 
     }

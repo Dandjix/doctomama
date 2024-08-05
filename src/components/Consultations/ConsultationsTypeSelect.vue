@@ -4,6 +4,7 @@
         label="Type de consultation"
         color="primary"
         v-model="selected"
+        :clearable="clearable"
 
     ></v-combobox>
     <!-- <h1>
@@ -44,6 +45,10 @@
                 required:true
             },
             autoSelectFirst:{
+                type:Boolean,
+                default:false
+            },
+            clearable:{
                 type:Boolean,
                 default:false
             }

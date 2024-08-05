@@ -1,5 +1,5 @@
 <template>
-  <h1>Disponibilites</h1>
+  <!-- <h1>Disponibilites</h1> -->
   <v-col>
     <v-row>
       <stepSelector v-model="time_step"></stepSelector>

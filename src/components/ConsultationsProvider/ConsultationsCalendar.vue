@@ -3,7 +3,8 @@
     :events="events"
     :time-from="min"
     :time-to="max"
-    :locale="fr">
+    :locale="fr"
+    :on-event-click="eventClicked">
     </vue-cal>
 </template>
 
@@ -78,6 +79,17 @@
                 const {min,max} = getMinAndMax(newValue)
                 this.min = min
                 this.max = max
+            }
+        },
+        emits:['consultationClick'],
+        methods:
+        {
+            eventClicked(event)
+            {
+                if(!event || event.eventType!="consultation")
+                    return
+                // console.log("clicked at : "+JSON.stringify(event));
+                this.$emit('consultationClick',event.id)
             }
         }
     }

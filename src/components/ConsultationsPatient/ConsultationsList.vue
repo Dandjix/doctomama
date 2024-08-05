@@ -12,7 +12,7 @@
 </template>
 
 <script>
-    import ConsultationItem from '@/components/Consultations/ConsultationItem.vue'
+    import ConsultationItem from '@/components/ConsultationsPatient/ConsultationItem.vue'
 
     export default{
         name:'ConsultationsList',

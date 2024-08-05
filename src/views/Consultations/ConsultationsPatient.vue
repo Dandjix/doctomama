@@ -36,8 +36,8 @@
 </template>
 
 <script>
-    import ConsultationsList from '@/components/Consultations/ConsultationsList.vue'
-    import ConsultationCancelDialog from './ConsultationCancelDialog.vue';
+    import ConsultationsList from '@/components/ConsultationsPatient/ConsultationsList.vue'
+    import ConsultationCancelDialog from '../../components/ConsultationsPatient/ConsultationCancelDialog.vue';
     import ChangesSnackbar from '@/components/Utility/ChangesSnackbar.vue';
 
     import consultationsService from '@/services/ConsultationsService';
@@ -139,7 +139,12 @@
                     this.dialogLoading = true
 
                     try{
-                        await consultationsService.cancelConsultation(this.email_patient,newValue)
+                        const id = this.dialogConsult.id
+                        // console.log("id : "+id);
+                        
+                        await consultationsService.cancelConsultation(this.email_patient,newValue,id)
+
+                        this.dialogOTPCode = ''
                     }
                     catch(e){
                         // console.log("dans le catch");

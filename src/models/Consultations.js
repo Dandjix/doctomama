@@ -21,6 +21,12 @@ const getConsultationByEmailAndId = async (email,id) =>
     return data
 }
 
+const getConsultationById = async (session,id) =>
+{
+    const {data} = await axios.get(`${BASE_URL}/consultations/oneById?session=${session}&id=${id}`)
+    return data
+}
+
 const getTimeSlots = async (idTypeConsult) =>
 {
     // console.log("dans getConsultations");
@@ -57,9 +63,9 @@ const sendCancelConsultationEmail = async (email,consultationId) =>
     // console.log("res sendCancelConsultationEmail : "+JSON.stringify(res));
 }
 
-const deleteConsultation = async (email,OTPCode) =>
+const deleteConsultation = async (email,OTPCode,id) =>
 {
-    const url = `${BASE_URL}/consultations?email=${email}&OTPCode=${OTPCode}`
+    const url = `${BASE_URL}/consultations?email=${email}&OTPCode=${OTPCode}&consultId=${id}`
     
     await axios.delete(url)
 
@@ -70,6 +76,7 @@ export {
     getConsultationsByEmail,
     getConsultations,
     getConsultationByEmailAndId,
+    getConsultationById,
     getTimeSlots,
     createConsultation,
 

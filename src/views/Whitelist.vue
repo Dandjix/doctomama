@@ -1,5 +1,5 @@
 <template>
-    <h1>Patient·e·s authorisé·e·s :</h1>
+    <!-- <h1>Patient·e·s authorisé·e·s :</h1> -->
 
     <v-sheet class="mx-auto" width="400" height="190">
         <v-form ref="addForm" @submit.prevent="addEmail" >

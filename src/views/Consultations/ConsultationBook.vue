@@ -6,7 +6,7 @@
       <v-row>
         <v-spacer></v-spacer>
         <v-sheet  class="my-5" width="500">
-          <ConsultationsTypeSelect v-model="consultationType"></ConsultationsTypeSelect>
+          <ConsultationsTypeSelect v-model="consultationType" clearable></ConsultationsTypeSelect>
         </v-sheet>
         <v-spacer></v-spacer>
       </v-row>
