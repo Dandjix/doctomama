@@ -11,12 +11,13 @@
     </v-row>
     <ConsultationsCalendar @consultationClick="consultationClicked" :events="events"></ConsultationsCalendar>
 
-    
+    <ConsultationModifyDialog v-model="modifyDialog" :consultation="consultationDialog"></ConsultationModifyDialog>
 </template>
 
 <script>
     import ConsultationsCalendar from '@/components/ConsultationsProvider/ConsultationsCalendar.vue';
     import ConsultationsTypeSelect from '@/components/Consultations/ConsultationsTypeSelect.vue';
+    import ConsultationModifyDialog from '@/components/ConsultationsProvider/ConsultationModifyDialog.vue';
 
     import ConsultationsService from '@/services/ConsultationsService';
     import { mapState } from 'vuex';
@@ -24,13 +25,17 @@
         name:"ConsultationsView",
         components:{
             ConsultationsCalendar,
-            ConsultationsTypeSelect
+            ConsultationsTypeSelect,
+            ConsultationModifyDialog
         },
         data()
         {
             return{
                 events:[],
-                consultationType:null
+                consultationType:null,
+
+                modifyDialog:false,
+                consultationDialog:null
             }
         },
         watch:{
@@ -84,7 +89,9 @@
             {
                 const consultation = {...(await ConsultationsService.getConsultationById(this.session,id)),id:id}
                 console.log("start : "+JSON.stringify(consultation));
-                
+
+                this.consultationDialog = consultation
+                this.modifyDialog = true
             }
         }
 
