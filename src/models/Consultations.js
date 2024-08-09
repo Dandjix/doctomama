@@ -27,20 +27,14 @@ const getConsultationById = async (session,id) =>
     return data
 }
 
-const getTimeSlots = async (idTypeConsult) =>
-{
-    // console.log("dans getConsultations");
-    const {data} = await axios.get(`${BASE_URL}/timeSlots/${idTypeConsult}`)
-    // console.log("rows : "+JSON.stringify(data));
-    return data
-}
+
 
 const createConsultation = async (email,telephone,consultationTypeId,start) =>
 {
     // console.log("start : "+JSON.stringify(start));
-    start = JSON.stringify(start)
-    start = start.substring(1,start.length-1)
-    // TODO : make the code above not suck ass
+
+    start = convertDateToTime(start)
+
     // console.log("start conv : "+start);
     
     const url = `${BASE_URL}/consultations?email=${email}&telephone=${telephone}&consultationTypeId=${consultationTypeId}&start=${start}`
@@ -72,14 +66,30 @@ const deleteConsultation = async (email,OTPCode,id) =>
     // console.log("res deleteConsultation : "+JSON.stringify(res));
 }
 
+function convertDateToTime(date)
+{
+    var res = JSON.stringify(date)
+    res = res.substring(1,res.length-1)
+    // TODO : make the code above not suck ass
+
+
+    return res
+
+}
+
+
+
 export {
     getConsultationsByEmail,
     getConsultations,
     getConsultationByEmailAndId,
     getConsultationById,
-    getTimeSlots,
+
     createConsultation,
 
     sendCancelConsultationEmail,
-    deleteConsultation
+    deleteConsultation,
+
+    // getTimeSlots,
+    // getTimeSlotsInRange
 }

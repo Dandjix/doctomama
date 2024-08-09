@@ -42,6 +42,7 @@ import ChangesSnackbar from '@/components/Utility/ChangesSnackbar.vue';
 
 import consultationsService from '@/services/ConsultationsService';
 import { mapActions, mapGetters } from 'vuex';
+import timeSlotsService from '@/services/TimeSlotsService';
 
 export default {
   name: 'Prendre Rendez-Vous',
@@ -115,7 +116,7 @@ export default {
       }
       // console.log("id : "+JSON.stringify(this.consultationType));
       this.duration = this.consultationType.duration
-      this.timeSlots = await consultationsService.getTimeSlots(this.consultationType.value)
+      this.timeSlots = await timeSlotsService.getTimeSlots(this.consultationType.value)
       // console.log("time slots : "+JSON.stringify(this.timeSlots));
       
     }
