@@ -30,7 +30,7 @@ const getConsultationById = async (session,id) =>
 const getTimeSlots = async (idTypeConsult) =>
 {
     // console.log("dans getConsultations");
-    const {data} = await axios.get(`${BASE_URL}/consultations/timeSlots/${idTypeConsult}`)
+    const {data} = await axios.get(`${BASE_URL}/timeSlots/${idTypeConsult}`)
     // console.log("rows : "+JSON.stringify(data));
     return data
 }
