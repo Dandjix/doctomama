@@ -23,11 +23,16 @@ const getTimeSlotsInRange = async (idTypeConsult,start,end) =>
 
 function convertDateToDate(date)
 {
-    const year = date.getFullYear()
-    const month = date.getMonth()
-    const day = date.getDate()
+    const year = date.getFullYear().toString()
+    const month = (date.getMonth()+1).toString()
+    const day = date.getDate().toString()
 
-    return `${year}-${zeroPad(month)}-${zeroPad(day)}`
+    const res = `${year}-${zeroPad(month)}-${zeroPad(day)}`
+
+    console.log("converted : "+JSON.stringify(date)+" to : "+res);
+    
+
+    return res
 }
 
 function zeroPad(value)

@@ -16,11 +16,15 @@
 
       <v-divider></v-divider>
 
+      <v-pagination v-model="page" :length="nbPages"></v-pagination>
+
       <TimeSlotsList :timeSlots="timeSlots" 
         :duration="duration" 
         @book="showBookPopup"
         class="mt-5"></TimeSlotsList>
       </v-col>
+
+      <v-pagination v-model="page" :length="nbPages"></v-pagination>
 
     <BookConsultationDialog 
     v-model="dialogVisible" 
@@ -43,6 +47,7 @@ import ChangesSnackbar from '@/components/Utility/ChangesSnackbar.vue';
 import consultationsService from '@/services/ConsultationsService';
 import { mapActions, mapGetters } from 'vuex';
 import timeSlotsService from '@/services/TimeSlotsService';
+import SettingsService from '@/services/SettingsService';
 
 export default {
   name: 'Prendre Rendez-Vous',
@@ -63,13 +68,22 @@ export default {
       dialogStart:null,
 
       snackbar:false,
-      snackbarMessage:""
+      snackbarMessage:"",
+
+      page:1,
+      nbPages:0,
+      startDate:null,
+      endDate:null
     }
   },
   watch:{
     async consultationType()
     {
-      this.refreshTimeSlots()
+      await this.refreshTimeSlots()
+    },
+    async page()
+    {
+      await this.pageChanged()
     }
   },
   computed:{
@@ -115,10 +129,39 @@ export default {
         return
       }
       // console.log("id : "+JSON.stringify(this.consultationType));
-      this.duration = this.consultationType.duration
-      this.timeSlots = await timeSlotsService.getTimeSlots(this.consultationType.value)
+
+      const nbDaysPlanification = await SettingsService.getSetting("duree_planification")
+      this.nbPages = Math.floor(nbDaysPlanification/7)
+      //ceil did not really work so whatever i dont like to think 
+      this.page = 1
+
+      await this.pageChanged()
+
+      // this.duration = this.consultationType.duration
+      // this.timeSlots = await timeSlotsService.getTimeSlotsInRange(this.consultationType.value,this.startDate,this.endDate)
       // console.log("time slots : "+JSON.stringify(this.timeSlots));
       
+    },
+    async pageChanged()
+    {
+      const daysPerPage = 7
+
+      var startDate = new Date()
+      startDate.setHours(0,0,0,0)
+      startDate.setDate(startDate.getDate()+daysPerPage*(this.page-1))
+      const endDate = new Date(startDate)
+
+      endDate.setDate(startDate.getDate()+daysPerPage*this.page)
+
+      this.startDate = startDate
+
+      this.endDate = endDate
+
+      console.log("range : "+JSON.stringify(startDate)+", ed : "+JSON.stringify(endDate));
+
+
+      this.duration = this.consultationType.duration
+      this.timeSlots = await timeSlotsService.getTimeSlotsInRange(this.consultationType.value,this.startDate,this.endDate)
     }
   },
   async mounted(){
