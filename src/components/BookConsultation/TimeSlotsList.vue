@@ -1,18 +1,30 @@
 <template>
 
-    <v-col>
-        <v-container v-for="timeSlots in timeSlotsPerDay" :key="timeSlots.day">
+    <v-col v-if="start!=null && end!=null">
+        <v-container v-for="(timeSlots,index) in timeSlotsPerDay" :key="timeSlots.day">
             <v-row>
                 <h3>{{formatDate(timeSlots.date)}}</h3>
             </v-row>
-            <v-row class="d-flex justify-space-between">
+            <v-row class="d-flex justify-space-between" v-if="timeSlots.timeSlots.length>0">
                 <TimeSlotItem 
                 :start="timeSlot.start" 
                 :duration="duration" 
                 @book="book"
                 v-for="timeSlot in timeSlots.timeSlots" :key="timeSlot.id"></TimeSlotItem>
             </v-row>
+            <v-row v-else>
+                 <v-sheet height="50">
+                    <p class="font-weight-thin">
+                        Pas de créneau ce jour.
+                    </p>
+                 </v-sheet>
+            </v-row>
+            <v-divider class="mt-10" color="primary" v-if="index < timeSlotsPerDay.length-1"></v-divider>
         </v-container>
+    </v-col>
+
+    <v-col v-else>
+        <!-- <h1>...</h1> -->
     </v-col>
     <!-- {{ timeSlotsPerDay }} -->
 </template>
@@ -33,6 +45,18 @@
             duration:{
                 type:Number,
                 required:true
+            },
+            disabled:{
+                type:Boolean,
+                default:false
+            },
+            start:{
+                type:Date,
+                default:null
+            },
+            end:{
+                type:Date,
+                default:null
             }
         },
         data(){
@@ -46,6 +70,7 @@
             timeSlotsPerDay()
             {
                 var days = []
+                // const timeSlots = [...this.timeSlots]
                 // console.log(" just tried to get tspd !");
                 for (let i = 0; i < this.timeSlots.length; i++) {
                     const timeSlot = this.timeSlots[i];
@@ -61,8 +86,26 @@
                         days[index].timeSlots.push(timeSlot)
                     }
                 }
+
+                var workingDate = new Date(this.start)
+
+                while(workingDate.getTime()<=this.end.getTime())
+                {
+                    if(!isInArray(days,workingDate))
+                    {
+                        days.push({date:new Date(workingDate),timeSlots:[]})
+                    }
+                    workingDate.setDate(workingDate.getDate()+1)
+                }
+
+                days.sort((a,b)=>
+                {
+                    return a.date.getTime() - b.date.getTime()
+                })
+
                 return days;
                 // return [{day:new Date(),timeSlots:this.timeSlots}]
+                // return []
             }
         },
         methods:{

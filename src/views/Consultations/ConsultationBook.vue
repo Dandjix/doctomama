@@ -18,10 +18,15 @@
 
       <v-pagination v-model="page" :length="nbPages"></v-pagination>
 
-      <TimeSlotsList :timeSlots="timeSlots" 
+      <TimeSlotsList 
+        :timeSlots="timeSlots" 
         :duration="duration" 
+        :start="startDate"
+        :end="endDate"
+
+        :disabled="timeSlotsListDisabled"
         @book="showBookPopup"
-        class="mt-5"></TimeSlotsList>
+        class=""></TimeSlotsList>
       </v-col>
 
       <v-pagination v-model="page" :length="nbPages"></v-pagination>
@@ -70,6 +75,9 @@ export default {
       snackbar:false,
       snackbarMessage:"",
 
+      timeSlotsListDisabled:false,
+      nbDaysPlanification:-1,
+
       page:1,
       nbPages:0,
       startDate:null,
@@ -77,13 +85,24 @@ export default {
     }
   },
   watch:{
-    async consultationType()
+    async consultationType(newValue)
     {
+      // console.log("new Value : "+newValue);
+      
+      if(newValue==null)
+      {
+        this.startDate = null
+        this.endDate = null
+        this.nbPages = 0
+        this.page = 1
+      }
       await this.refreshTimeSlots()
     },
     async page()
     {
+      this.timeSlotsListDisabled = true
       await this.pageChanged()
+      this.timeSlotsListDisabled = false
     }
   },
   computed:{
@@ -122,21 +141,28 @@ export default {
     },
     async refreshTimeSlots()
     {
+      // console.log("consT : "+this.consultationType);
+      
       if(!this.consultationType || !(this.consultationType instanceof Object))
       {
+        // console.log("null or not object");
+        
         this.timeSlots = []
         this.duration = -1
         return
       }
       // console.log("id : "+JSON.stringify(this.consultationType));
 
-      const nbDaysPlanification = await SettingsService.getSetting("duree_planification")
-      this.nbPages = Math.floor(nbDaysPlanification/7)
+      this.timeSlotsListDisabled = true
+
+      this.nbDaysPlanification = await SettingsService.getSetting("duree_planification")
+      this.nbPages = Math.ceil(this.nbDaysPlanification/7)
       //ceil did not really work so whatever i dont like to think 
       this.page = 1
 
       await this.pageChanged()
 
+      this.timeSlotsListDisabled = false
       // this.duration = this.consultationType.duration
       // this.timeSlots = await timeSlotsService.getTimeSlotsInRange(this.consultationType.value,this.startDate,this.endDate)
       // console.log("time slots : "+JSON.stringify(this.timeSlots));
@@ -144,20 +170,39 @@ export default {
     },
     async pageChanged()
     {
+      if(!this.consultationType || !(this.consultationType instanceof Object))
+      {
+        // console.log("null or not object");
+        
+        this.timeSlots = []
+        this.duration = -1
+        return
+      }
+
       const daysPerPage = 7
 
       var startDate = new Date()
       startDate.setHours(0,0,0,0)
+
+      const nbDaysDebut = startDate.getTime()/(24*60*60*1000)
+      const maxDays = nbDaysDebut + this.nbDaysPlanification
+
       startDate.setDate(startDate.getDate()+daysPerPage*(this.page-1))
       const endDate = new Date(startDate)
 
-      endDate.setDate(startDate.getDate()+daysPerPage*this.page)
+
+
+
+      endDate.setDate(startDate.getDate()+(daysPerPage-1))
+
+      if(endDate.getTime()/(24*60*60*1000)>maxDays)
+      endDate.setTime(maxDays*(24*60*60*1000))
 
       this.startDate = startDate
 
       this.endDate = endDate
 
-      console.log("range : "+JSON.stringify(startDate)+", ed : "+JSON.stringify(endDate));
+      // console.log("range : "+JSON.stringify(startDate)+", ed : "+JSON.stringify(endDate));
 
 
       this.duration = this.consultationType.duration
