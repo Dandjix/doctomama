@@ -23,7 +23,7 @@
         </v-container>
     </v-col>
 
-    <v-col v-else>
+    <!-- <v-col v-else>
         <v-row>
             <v-spacer></v-spacer>
             <h1>
@@ -31,7 +31,7 @@
             </h1>
             <v-spacer></v-spacer>
         </v-row>
-    </v-col>
+    </v-col> -->
     <!-- {{ timeSlotsPerDay }} -->
 </template>
 
