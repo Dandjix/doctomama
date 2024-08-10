@@ -1,6 +1,6 @@
 <template>
 
-    <v-col v-if="start!=null && end!=null">
+    <v-col v-if="start!=null && end!=null && !disabled">
         <v-container v-for="(timeSlots,index) in timeSlotsPerDay" :key="timeSlots.day">
             <v-row>
                 <h3>{{formatDate(timeSlots.date)}}</h3>
@@ -24,7 +24,13 @@
     </v-col>
 
     <v-col v-else>
-        <!-- <h1>...</h1> -->
+        <v-row>
+            <v-spacer></v-spacer>
+            <h1>
+                ...
+            </h1>
+            <v-spacer></v-spacer>
+        </v-row>
     </v-col>
     <!-- {{ timeSlotsPerDay }} -->
 </template>
