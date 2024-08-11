@@ -57,6 +57,15 @@ const sendCancelConsultationEmail = async (email,consultationId) =>
     // console.log("res sendCancelConsultationEmail : "+JSON.stringify(res));
 }
 
+const getDeletionCooldown = async (id) =>
+{
+    const url = `${BASE_URL}/consultations/deletionCooldown?id=${id}`
+
+    const response = await axios.get(url)
+
+    return response.data
+}
+
 const deleteConsultation = async (email,OTPCode,id) =>
 {
     const url = `${BASE_URL}/consultations?email=${email}&OTPCode=${OTPCode}&consultId=${id}`
@@ -88,6 +97,7 @@ export {
     createConsultation,
 
     sendCancelConsultationEmail,
+    getDeletionCooldown,
     deleteConsultation,
 
     // getTimeSlots,

@@ -29,7 +29,7 @@
     :loading="dialogLoading" 
     :consult="dialogConsult"
     @resend="sendEmail(true)"
-    @cancel="cancelDialog = false"></ConsultationCancelDialog>
+    @cancel="cancelCancelation"></ConsultationCancelDialog>
 
     <ChangesSnackbar v-model="snackbar" :message="snackbarMessage"></ChangesSnackbar>
 
@@ -75,11 +75,24 @@
 
                 // console.log("consult : "+JSON.stringify(consult))
 
-                await this.sendEmail(false)
 
+                const cooldown = await consultationsService.getDeletionCooldown(id)
+
+                if(cooldown>0)
+                {
+                    this.$refs.cancelDialog.startCooldown(cooldown)
+                }
+                else
+                {
+                    await this.sendEmail(false)
+                }
                 // this.$refs.cancelDialog.startCooldown()
 
                 this.dialogLoading = false
+            },
+            async cancelCancelation()
+            {
+                this.cancelDialog = false
             },
             async sendEmail(autonomous=false)
             {

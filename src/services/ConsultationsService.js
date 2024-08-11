@@ -6,6 +6,7 @@ import {
     createConsultation,
 
     sendCancelConsultationEmail,
+    getDeletionCooldown,
     deleteConsultation,
     } 
 from '../models/Consultations'
@@ -75,6 +76,10 @@ const consultationsService = {
             throw e
         }
 
+    },
+    async getDeletionCooldown(id)
+    {
+        return await getDeletionCooldown(id)
     },
     async cancelConsultation(email,OTPCode,id)
     {

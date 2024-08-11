@@ -66,7 +66,9 @@
 </style>
 
 <script>
-    import {formatTime} from '@/utils/date'
+    import dateUtils from '@/utils/date'
+    // console.log("daeUtils : "+dateUtils);
+    
     import WhitelistService from '@/services/WhitelistService';
 import { mapGetters } from 'vuex';
     export default{
@@ -150,7 +152,8 @@ import { mapGetters } from 'vuex';
         computed:{
             ...mapGetters(['email_patient','telephone_patient']),
             formatedTime(){
-                return formatTime(this.start,this.consultationType.duration)
+                return dateUtils.formatTime(this.start,this.consultationType.duration)
+                // return 'error'
             },
             title(){
                 // console.log(JSON.stringify(this.consultationType));

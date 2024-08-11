@@ -49,7 +49,7 @@
 </template>
 
 <script>
-    import { formatTime } from '@/utils/date'; 
+    import dateUtils from '@/utils/date'; 
 
     export default{
         name:'ConsultationCancelDialog',
@@ -79,15 +79,25 @@
             return{
                 visible:this.modelValue,
                 code:'',
-                cooldown_max : 21,
-                cooldown : 0
+                cooldown_max : 20,
+                cooldown : 0,
+
+                cooldownInterval:null
             }
         },
         emits:['resend','cancel'],
         methods:{
-            startCooldown() {
+            startCooldown(cooldownTotal=-1) {
                 //justiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiice
-                this.cooldown = this.cooldown_max;
+                if(cooldownTotal<0)
+                {
+                    this.cooldown = this.cooldown_max;
+                }
+                else
+                {
+                    this.cooldown = cooldownTotal
+                }
+
                 this.cooldownInterval = setInterval(() => {
                     // console.log("cooldown : "+this.cooldown);
                     
@@ -97,6 +107,12 @@
                         clearInterval(this.cooldownInterval);
                     }
                 }, 1000); // Decrease cooldown every 1 second
+            },
+            stopCooldown()
+            {
+                if (this.cooldownInterval) {
+                    clearInterval(this.cooldownInterval);
+                }
             },
             resend()
             {
@@ -133,7 +149,7 @@
             {
                 if(this.consult==null)
                     return ""
-                return formatTime(this.consult.debut,this.consult.duree_minutes)
+                return dateUtils.formatTime(this.consult.debut,this.consult.duree_minutes)
             }
         }
     }
