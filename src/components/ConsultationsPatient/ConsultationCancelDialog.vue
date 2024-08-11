@@ -20,7 +20,7 @@
             <v-row>
                 <v-spacer></v-spacer>
                 <v-col cols="8">
-                    <v-progress-linear color="primary" v-if="cooldown>0" :model-value="(cooldown*100)/cooldown_max"></v-progress-linear>
+                    <v-progress-linear color="primary" v-if="cooldown>0 && !loading" :model-value="(cooldown*100)/cooldown_max"></v-progress-linear>
                 </v-col>
                 <v-spacer></v-spacer>
             </v-row>
