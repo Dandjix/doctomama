@@ -21,7 +21,7 @@
         },
         props:{
             consultations:{
-                type:[],
+                type:Array,
                 required:true
             }
         },

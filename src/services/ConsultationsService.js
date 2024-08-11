@@ -19,7 +19,8 @@ const consultationsService = {
     {
         // console.log("dans getAllConsultations");
         try{
-            return toConsultationEvents( await getConsultations(session))
+            // return toConsultationEvents( await getConsultations(session))
+            return await getConsultations(session)
         }
         catch(error){
             console.error("error getting all consultations : "+error);
@@ -95,31 +96,32 @@ const consultationsService = {
     }
 }
 
-function toConsultationEvents(consultations)
-{
-    // console.log(JSON.stringify(consultations)+" : "+typeof consultations);
-    // return consultations
+// function toConsultationEvents(consultations)
+// {
+//     // console.log(JSON.stringify(consultations)+" : "+typeof consultations);
+//     // return consultations
 
-    const events = consultations.map((consult)=>
-    {
-        // console.log("consult : "+JSON.stringify(consult));
+//     const events = consultations.map((consult)=>
+//     {
+//         // console.log("consult : "+JSON.stringify(consult));
         
-        const debut = new Date(consult.debut)
-        const fin = new Date(debut)
-        fin.setMinutes(fin.getMinutes()+consult.duree_minutes)
-        return {
-            id:consult.id,
-            title:`${consult.nom} : ${consult.email}`,
-            start:debut,
-            end:fin,
-            eventType:'consultation',
-            class:'consultation'
-        }
-    }
-    )
+//         const debut = new Date(consult.debut)
+//         const fin = new Date(debut)
+//         fin.setMinutes(fin.getMinutes()+consult.duree_minutes)
+//         return {
+//             id:consult.id,
+//             title:`${consult.nom} : ${consult.email}`,
+//             start:debut,
+//             end:fin,
+//             typeid:consult.typeid,
+//             eventType:'consultation',
+//             class:'consultation'
+//         }
+//     }
+//     )
 
-    return events
-}
+//     return events
+// }
 
 
 

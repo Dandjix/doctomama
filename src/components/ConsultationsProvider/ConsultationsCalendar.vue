@@ -31,7 +31,8 @@
 </style>
 
 <script>
-    import VueCal from 'vue-cal';
+    import SettingsService from '@/services/SettingsService';
+import VueCal from 'vue-cal';
 
     const fr = {
         "weekDays": ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"],
@@ -68,15 +69,15 @@
         props:
         {
             events:{
-                type:[],
+                type:Array,
                 required:true
             }
         },
         watch:
         {
-            events(newValue)
+            async events(newValue)
             {
-                const {min,max} = getMinAndMax(newValue)
+                const {min,max} = await getMinAndMax(newValue)
                 this.min = min
                 this.max = max
             }
@@ -94,8 +95,15 @@
         }
     }
 
-    function getMinAndMax(events)
+    async function getMinAndMax(events)
     {
+        var settingsMin = await SettingsService.getSetting('heure_debut_calendrier')
+        var settingsMax = await SettingsService.getSetting('heure_fin_calendrier')
+
+        settingsMax = hourToMinutes(settingsMax)
+        settingsMin = hourToMinutes(settingsMin)
+        // console.log("sm : "+JSON.stringify(settingsMin));
+
         var min = 60*24
         var max = 0
         // console.log("new value for events : "+newValue);
@@ -108,6 +116,21 @@
             if(endMin>max)
                 max = endMin
         }
+        // console.log("min : "+min);
+        
+
+        min = Math.min(min,settingsMin)
+        max = Math.max(max,settingsMax)
         return {min,max}
+    }
+
+    function hourToMinutes(hour)
+    {
+        const [hours,minutes] = hour.split(":")
+
+        // console.log("h : "+hours+", m : "+minutes);
+        
+
+        return Number(hours)*60+Number(minutes)
     }
 </script>

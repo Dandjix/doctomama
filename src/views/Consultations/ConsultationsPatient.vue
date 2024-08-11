@@ -29,7 +29,7 @@
     :loading="dialogLoading" 
     :consult="dialogConsult"
     @resend="sendEmail(true)"
-    @cancel="cancelCancelation"></ConsultationCancelDialog>
+    @cancel="cancelCancel"></ConsultationCancelDialog>
 
     <ChangesSnackbar v-model="snackbar" :message="snackbarMessage"></ChangesSnackbar>
 
@@ -90,8 +90,9 @@
 
                 this.dialogLoading = false
             },
-            async cancelCancelation()
+            async cancelCancel()
             {
+                this.$refs.cancelDialog.stopCooldown()
                 this.cancelDialog = false
             },
             async sendEmail(autonomous=false)

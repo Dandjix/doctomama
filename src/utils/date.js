@@ -1,22 +1,34 @@
-export function formatTime(startTime,duration){
-    const days = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
-    const months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Novembre','Décembre']
+const days = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
+const months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Novembre','Décembre']
 
-    const start = new Date(startTime)
-    const end = new Date(startTime)
-    end.setMinutes(start.getMinutes()+duration)
+const dateUtils = {
+    formatTime(startTime,duration){
+
     
-    const day = days[modulo(start.getDay()-1,7)]
-    const date = start.getDate()
-    const month = months[start.getMonth()]
-    const year = start.getFullYear()
-    const startHour = `${zeroPad(start.getHours())}:${zeroPad(start.getMinutes())}`
-    const endHour = `${zeroPad(end.getHours())}:${zeroPad(end.getMinutes())}`
+        const start = new Date(startTime)
+        const end = new Date(startTime)
+        end.setMinutes(start.getMinutes()+duration)
+        
+        const day = days[modulo(start.getDay()-1,7)]
+        const date = start.getDate()
+        const month = months[start.getMonth()]
+        const year = start.getFullYear()
+        const startHour = `${zeroPad(start.getHours())}:${zeroPad(start.getMinutes())}`
+        const endHour = `${zeroPad(end.getHours())}:${zeroPad(end.getMinutes())}`
+    
+        return `${day} ${date} ${month} ${year} de ${startHour} à ${endHour}`
+    
+        // return "Lundi 18 Janvier 2024 de 08:00 à 9:00"
+    },
 
-    return `${day} ${date} ${month} ${year} de ${startHour} à ${endHour}`
+    // formatDate(date){
 
-    // return "Lundi 18 Janvier 2024 de 08:00 à 9:00"
+    // }
 }
+
+export default dateUtils
+
+
 
 function zeroPad(number)
 {

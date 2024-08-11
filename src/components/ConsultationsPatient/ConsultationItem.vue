@@ -15,7 +15,7 @@
 </template>
 
 <script>
-    import {formatTime} from '@/utils/date'
+    import dateUtils from '@/utils/date'
 
     export default{
         name:'ConsultationItem',
@@ -27,7 +27,7 @@
         },
         computed:{
             formatedTime(){
-                return formatTime(this.consultation.debut,this.consultation.duree_minutes)
+                return dateUtils.formatTime(this.consultation.debut,this.consultation.duree_minutes)
             }
         },
         emits:['cancel'],
