@@ -69,8 +69,9 @@
     import dateUtils from '@/utils/date'
     // console.log("daeUtils : "+dateUtils);
     
-    import WhitelistService from '@/services/WhitelistService';
+    // import WhitelistService from '@/services/WhitelistService';
 import { mapGetters } from 'vuex';
+import consultationRules from '@/utils/rules/consultationRules';
     export default{
         data()
         {
@@ -80,42 +81,8 @@ import { mapGetters } from 'vuex';
                 email:'',
                 phoneNbr:'',
 
-                rulesEmail:[
-                    email =>{
-                        if(!email)
-                            return 'un email est requis'
-                        return true
-                    },
-                    email =>{
-                        // const emailRegex = /^[a-zA-Z0-9\u0400-\u04FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\uAC00-\uD7AF@.-]+$/;
-                        const emailRegex = /^[a-zA-Z0-9\u0400-\u04FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\uAC00-\uD7AF._%+-]+@[a-zA-Z0-9\u0400-\u04FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\uAC00-\uD7AF.-]+\.[a-zA-Z\u0400-\u04FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\uAC00-\uD7AF]{2,}$/;
-        
-                        // Check if email matches the regular expression
-                        const isValid = emailRegex.test(email);
-                        // console.log("in rules. Valid ? "+isValid);
-                        if(isValid) return true
-                        return 'email invalide'
-                    },
-                    async email =>{
-                        const whitelisted = await WhitelistService.check(email)
-                        if(whitelisted) return true
-                        return "cet email n'a pas été authorisé"
-                    }
-                ],
-                rulesPhoneNbr:[
-                    phoneNbr =>{
-                        if(!phoneNbr)
-                            return "un numéro de téléphone est requis"
-                        return true
-                    },
-                    phoneNbr =>{
-                        const internationalRegexp = /^\+\d{11}$/;
-                        const frenchRegexp = /^\d{10}$/;
-                        if(!internationalRegexp.test(phoneNbr) && !frenchRegexp.test(phoneNbr))
-                            return 'numéro de téléphone invalide'
-                        return true
-                    }
-                ]
+                rulesEmail:consultationRules.rulesEmail,
+                rulesPhoneNbr:consultationRules.rulesTelephone
             }
         },
         props:{

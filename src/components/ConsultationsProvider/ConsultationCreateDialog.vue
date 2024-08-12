@@ -5,25 +5,46 @@
                 <v-card-title>{{ consultation.title }}</v-card-title>
                 <v-card-text>
                     <v-row>
+                        <v-col cols="12" md="6">
+                            <v-row>
 
-                        <v-col cols="12" md="6" >
-                            <v-text-field disabled v-model="email" label="email" ></v-text-field>
+                                <v-col cols="12">
+                                    <v-text-field v-model="email" label="email" :rules="rulesEmail"></v-text-field>
+                                </v-col>
+
+                                <v-col cols="12">
+                                    <v-text-field v-model="telephone" label="téléphone" :rules="rulesTelephone" ></v-text-field>
+                                </v-col>
+
+                                <v-col cols="12">
+                                    <ConsultationsTypeSelect v-model="typeConsultation" :rules="rulesConsultationType"></ConsultationsTypeSelect>
+                                </v-col>
+                                <v-col cols="12">
+                                    <v-date-picker 
+                                    v-model="dateConsultation"
+                                    color="primary" 
+                                    first-day-of-week="1" 
+                                    label="Date de la consultation" 
+                                    placeholder="jj/mm/aaaa"
+                                    
+                                    :rules="rulesDate"></v-date-picker>
+                                </v-col>
+                            </v-row>
                         </v-col>
 
-                        <v-col cols="12" md="6" >
-                            <v-text-field disabled v-model="telephone" label="téléphone" ></v-text-field>
+                        <v-col cols="12" md="6">
+                            <v-time-picker 
+                            v-model="hourConsultation"
+                            @update:hour="hourConsultationUpdateHour"
+                            color="primary" 
+                            format="24h"
+                            :min="minHour"
+                            :max="maxHourOffset"
+
+                            title="Heure de début de la consultation"
+
+                            :rules="rulesTimePicker"></v-time-picker>
                         </v-col>
-
-                        <v-col cols="12" md="12" >
-                            <ConsultationsTypeSelect v-model="typeConsultation" :rules="rulesConsultationType"></ConsultationsTypeSelect>
-                        </v-col>
-
-                        <!-- <v-col cols="12" md="6" class="d-flex justify-center"> -->
-
-                        <TimeAndDatePicker v-model="timeConsultation" class="mx-10"></TimeAndDatePicker>
-
-                        <!-- </v-col> -->
-
                     </v-row>
                     <v-row>
                         <v-spacer></v-spacer>
@@ -49,8 +70,7 @@
 <script>
     import dateUtils from '@/utils/date'
     import ConsultationsTypeSelect from '../Consultations/ConsultationsTypeSelect.vue';
-    import TimeAndDatePicker from '../Utility/TimeAndDatePicker.vue';
-    // import { VTimePicker } from 'vuetify/labs/VTimePicker'
+    import { VTimePicker } from 'vuetify/labs/VTimePicker'
     // import { VDateInput } from 'vuetify/labs/VDateInput'
     import consultationTypesService from '@/services/ConsultationTypesService';
     import SettingsService from '@/services/SettingsService';
@@ -58,10 +78,12 @@
     import consultationRules from '@/utils/rules/consultationRules';
 
     export default{
-        name:"ConsultationModifyDialog",
+        name:"ConsultationCreateDialog",
         components:{
             ConsultationsTypeSelect,
-            TimeAndDatePicker
+            // ConsultationModifyOverlapDialog,
+            VTimePicker,
+            // VDateInput
         },
         props:{
             consultation:{
@@ -76,13 +98,21 @@
         watch:{
             async consultation(newValue)
             {
+                // console.log("nv : "+JSON.stringify(newValue));
+                
+                // console.log("nv : "+JSON.stringify(newValue));
                 const typeId = newValue.typeid
-
+                // console.log("ti : "+typeId);
                 this.typeConsultation = typeId
+                // this.title = newValue.title
 
+                const startDate = new Date(newValue.start)
+                const startHour = `${startDate.getHours()}:${zeroPad(startDate.getMinutes())}`
 
-                this.timeConsultation = new Date(newValue.start)
+                startDate.setHours(0,0,0,0)
 
+                this.dateConsultation = startDate
+                this.hourConsultation = startHour
 
                 var idType
                 if( (typeof this.typeConsultation) == "number"){
@@ -189,30 +219,44 @@
             {
                 const form = this.$refs.form
 
-                const {valid: validFromValidation} = await form.validate()
+                const {valid} = await form.validate()
 
-                if(!validFromValidation)
+                if(!valid)
                 {
                     console.log("form invalid !");
                     return
                 }   
 
-                var idType;
+                // console.log("cons : "+JSON.stringify(this.consultation));
+                // console.log("tc : "+JSON.stringify(this.typeConsultation));
 
+                var idType;
+                // console.log("t : "+(typeof this.typeConsultation));
+                
                 if( (typeof this.typeConsultation) == "number")
                 {
-                    idType = this.typeConsultation 
+
+                    idType = this.typeConsultation
+                    // console.log("itsa number :"+idType);
+                    
                 }
                 else //if typeof Object
                 {
+
                     idType = this.typeConsultation.value
+                    // console.log("itsa obj :"+idType);
                 }
 
-                const start = this.timeConsultation
-
+                // console.log("idt : "+idType);
+                
+                
+                
+                const hourParts = this.hourConsultation.split(':')
+                const start = new Date(this.dateConsultation)
+                start.setHours(hourParts[0],hourParts[1])
                 
                 const consultation = {id:this.consultation.id,start:start,typeid:idType}
-
+                // const consultation = {}
                 this.$emit('update',consultation)
             },
             deleteConsultation()
@@ -239,7 +283,8 @@
         data(){
             return{
                 typeConsultation:null,
-                timeConsultation:null,
+                dateConsultation:null,
+                hourConsultation:null,
 
                 minHour:"00:00:00",
                 maxHour:"23:59:59",
@@ -251,6 +296,8 @@
                 rulesConsultationType:consultationRules.rulesConsultationType,
                 rulesDate:consultationRules.rulesDate,
                 rulesTimePicker:consultationRules.rulesTimePicker,
+                rulesEmail:consultationRules.rulesEmail,
+                rulesTelephone:consultationRules.rulesTelephone
             }
         }
     }

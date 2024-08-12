@@ -1,0 +1,182 @@
+<template>
+    <v-row>
+        <v-col cols="12" md="6">
+
+                <v-date-picker 
+                v-model="date"
+                color="primary" 
+                first-day-of-week="1" 
+                :title="dateLabel"
+                placeholder="jj/mm/aaaa"
+                @update:model-value="updateDate"
+
+                :min="minDate"
+                :max="maxDate"
+                ></v-date-picker>
+
+        </v-col>
+        <v-col cols="12" md="6">
+
+                <v-time-picker
+                v-model="hour"
+                :title="hoursLabel"
+                format="24hr"
+                @update:hour="updateHoursHour"
+                @update:minute="updateHoursMinute"
+
+                :min="min"
+                :max="max"
+
+                ></v-time-picker>
+
+        </v-col>
+    </v-row>
+</template>
+
+<script>
+    import { VTimePicker } from 'vuetify/labs/VTimePicker'
+    export default{
+        name:"TimeAndDatePicker",
+        components:{
+            VTimePicker
+        },
+        props:{
+            modelValue:{
+                type:Date,
+                required:true
+            },
+            dateLabel:{
+                type:String,
+                default:"date label"
+            },
+            hoursLabel:{
+                type:String,
+                default:"hours label"
+            },
+            minMinutes:{
+                type:Number,
+                default:0
+            },
+            maxMinutes:{
+                type:Number,
+                default:1440
+            },
+            minDate:{
+                type:Date,
+                default:new Date('1970-01-01')
+            },
+            maxDate:{
+                type:Date,
+                default:new Date('9999-01-01')
+            }
+        },
+        data(){
+            const date = new Date(this.modelValue)
+            date.setHours(0,0,0,0)
+
+            const hour = `${this.modelValue.getHours()}:${this.modelValue.getMinutes()}`
+            return {
+                date: date,
+                hour:hour
+            }
+        },
+        computed:{
+            time:{
+                get()
+                {
+                    return this.modelValue
+                },
+                set(value)
+                {
+                    // this.setTime(value)
+                    this.$emit('update:modelValue',value)
+                }
+            },
+            min:{
+                get()
+                {
+                    const hours = Math.floor(this.minMinutes/60)
+                    const minutes = this.minMinutes%60
+                    return `${hours}:${minutes}`
+                }
+            },
+            max:{
+                get()
+                {
+                    const hours = Math.floor(this.maxMinutes/60)
+                    const minutes = this.maxMinutes%60
+                    return `${hours}:${minutes}`
+                }
+            }
+        },
+        methods:{
+            // setTime(time)
+            // {
+            //     const date = new Date(time)
+            //     date.setHours(0,0,0,0)
+            //     const hours = `${time.getHours()}:${time.getMinutes()}`
+
+            //     this.date = date
+            //     this.hours = hours
+            // },
+            // getTime()
+            // {
+            //     const [hours,minutes] = this.hour.split(':')
+            //     const date = new Date(this.date)
+            //     date.setHours(hours,minutes)
+
+            //     return date
+            // },
+            updateDate(newValue)
+            {
+                // console.log("upd d");
+                
+
+                const time = new Date(this.time)
+
+                time.setFullYear(newValue.getFullYear())
+                time.setMonth(newValue.getMonth())
+                time.setDate(newValue.getDate())
+
+                this.$emit('update:model-value',time)
+            },
+            updateHours(newValue)
+            {
+                // console.log("upd h : "+newValue);
+
+                const time = new Date(this.time)
+
+                const [hours,minutes] = newValue.split(':')
+                time.setHours(hours,minutes,0,0)
+
+                this.hour = newValue
+
+                this.$emit('update:model-value',time)
+            },
+            updateHoursHour(hour)
+            {
+                var minutes
+                const split = this.hour.split(':')
+                if(split.length>=2)
+                    minutes = split[1]
+                else
+                    minutes = '00'
+
+                
+                this.updateHours(`${hour}:${minutes}`)
+            },
+            updateHoursMinute(minutes)
+            {
+                var hour
+                const split = this.hour.split(':')
+                if(split.length>=2)
+                    hour = split[0]
+                else
+                    hour = '00'
+
+                
+                this.updateHours(`${hour}:${minutes}`)
+            }
+        }
+    }
+</script>
