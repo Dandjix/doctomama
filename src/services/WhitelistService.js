@@ -1,4 +1,4 @@
-import {addItem,deleteItem, getItems,getNbPages,check} from '../models/Whitelist'
+import {addItem,deleteItem, getItems,getNbPages,check, getAllItems} from '../models/Whitelist'
 
 const WhitelistService = {
   async getItems(session,page,patern) {
@@ -7,6 +7,16 @@ const WhitelistService = {
         const items = await getItems(session,page,patern);
 
         return items
+    } catch (error) {
+      console.error('whitelist service Error:', error);
+      throw error; // Re-throw the error to handle it in the component
+    }
+  },
+  async getAllItems(session,patern) {
+    try {
+      const items = await getAllItems(session,patern);
+
+      return items
     } catch (error) {
       console.error('whitelist service Error:', error);
       throw error; // Re-throw the error to handle it in the component

@@ -12,6 +12,17 @@ const getItems = async (session,page,patern) => {
     }
 };
 
+const getAllItems = async (session,patern) => {
+    try {
+        // console.log("about to get ..");
+        const response = await axios.get(`${BASE_URL}/whitelist/all?session=${session}&patern=${patern}`);
+        // console.log("data : "+response.data);
+        return response.data;
+    } catch (error) {
+        throw Error('Error getting all whitelist items');
+    }
+};
+
 const getNbPages = async (session,patern) => {
     try {
         const res = await axios.get(`${BASE_URL}/whitelist/nbPages?session=${session}&patern=${patern}`);
@@ -53,6 +64,7 @@ const check = async(email) => {
 export
 {
     getItems,
+    getAllItems,
     getNbPages,
     addItem,
     deleteItem,

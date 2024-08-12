@@ -1,25 +1,34 @@
 <template>
     <h1>Consultations !</h1>
-    <v-row>
-        <v-spacer></v-spacer>
-        <v-col>
-            <v-sheet width="500">
-                <ConsultationsTypeSelect v-model="consultationType" clearable></ConsultationsTypeSelect>
-            </v-sheet>
-        </v-col>
-        <v-spacer></v-spacer>
-    </v-row>
-    <ConsultationsCalendar @consultationClick="consultationClicked" :events="events"></ConsultationsCalendar>
+    <ConsultationsCalendar 
+    @consultationClick="consultationClicked" 
+    @cellClicked="cellClicked"
 
-    <ConsultationModifyDialog v-model="modifyDialog" :consultation="consultationDialog" @update="updateConsultation"></ConsultationModifyDialog>
+    @eventDeleted="deleteConsultation"
+    @eventDropped="eventDropped"
+    :events="events"></ConsultationsCalendar>
+
+    <ConsultationModifyDialog 
+    v-model="modifyDialog" 
+    :consultation="consultationModifyDialog" 
+    @update="updateConsultation"
+    @delete="deleteConsultation"
+    ></ConsultationModifyDialog>
+
+    <ConsultationCreateDialog
+    v-model="createDialog"
+    :date="dateCreateDialog"
+    @create="createConsultation"
+    ></ConsultationCreateDialog>
 
     <ConsultationModifyOverlapDialog v-model="overlapDialog"></ConsultationModifyOverlapDialog>
 </template>
 
 <script>
     import ConsultationsCalendar from '@/components/ConsultationsProvider/ConsultationsCalendar.vue';
-    import ConsultationsTypeSelect from '@/components/Consultations/ConsultationsTypeSelect.vue';
+    // import ConsultationsTypeSelect from '@/components/Consultations/ConsultationsTypeSelect.vue';
     import ConsultationModifyDialog from '@/components/ConsultationsProvider/ConsultationModifyDialog.vue';
+    import ConsultationCreateDialog from '@/components/ConsultationsProvider/ConsultationCreateDialog.vue';
 
 
     import ConsultationsService from '@/services/ConsultationsService';
@@ -27,13 +36,14 @@
     import { mapState } from 'vuex';
     import ConsultationModifyOverlapDialog from '@/components/ConsultationsProvider/ConsultationModifyOverlapDialog.vue';
     import consultationsService from '@/services/ConsultationsService';
-import timeSlotsService from '@/services/TimeSlotsService';
+    // import timeSlotsService from '@/services/TimeSlotsService';
     export default{
         name:"ConsultationsView",
         components:{
             ConsultationsCalendar,
-            ConsultationsTypeSelect,
+            // ConsultationsTypeSelect,
             ConsultationModifyDialog,
+            ConsultationCreateDialog,
             ConsultationModifyOverlapDialog
         },
         data()
@@ -42,53 +52,22 @@ import timeSlotsService from '@/services/TimeSlotsService';
                 events:[],
 
                 consultationsToUpdate:[],
-                consultationsToDelete:[],
+                consultationIdsToDelete:[],
                 consultationsToCreate:[],
 
-                consultationType:null,
+                // consultationType:null,
 
                 modifyDialog:false,
-                consultationDialog:null,
+                consultationModifyDialog:null,
+
+                createDialog:false,
+                dateCreateDialog:null,
 
                 overlapDialog:false,
 
             }
         },
         watch:{
-            async consultationType(newValue){
-                // console.log("new value for consultation Type : "+JSON.stringify(newValue));
-                var timeSlots;
-                // console.log("type : "+!(newValue instanceof Object));
-                if(!newValue || !(newValue instanceof Object)){
-                    timeSlots = []
-                    let newEvents = []
-                    // console.log(JSON.stringify(timeSlots));
-                    // console.log(JSON.stringify(this.events));
-                    for (let i = 0; i < this.events.length; i++) {
-                        const event = this.events[i];
-                        if(event.eventType=="consultation")
-                        {
-                            newEvents.push(event)
-                        }
-                    }
-                    this.events = newEvents.concat(timeSlots)
-                    return
-                }
-                // console.log("id : "+newValue.id);
-                timeSlots = await timeSlotsService.getTimeSlots(newValue.value)
-                let newEvents = []
-                // console.log(JSON.stringify(timeSlots));
-                // console.log(JSON.stringify(this.events));
-                for (let i = 0; i < this.events.length; i++) {
-                    const event = this.events[i];
-                    if(event.eventType=="consultation")
-                    {
-                        newEvents.push(event)
-                    }
-                }
-
-                this.events = newEvents.concat(timeSlots)
-            }
         },
         computed:
         {
@@ -106,11 +85,30 @@ import timeSlotsService from '@/services/TimeSlotsService';
                 // const consultation = {...(await ConsultationsService.getConsultationById(this.session,id)),id:id}
                 const consultation = this.events.find((x)=>{return x.id == id}) 
 
-                // console.log("1 : "+JSON.stringify(consultation));
-                // console.log("2 : "+JSON.stringify(consultation));
+                // console.log("c : "+JSON.stringify(consultation));
+                if(consultation.eventType=="consultation")
+                {
+                    this.consultationModifyDialog = consultation
+                    this.modifyDialog = true  
+                }
 
-                this.consultationDialog = consultation
-                this.modifyDialog = true
+            },
+            cellClicked(date)
+            {
+                // console.log("clicked at date : "+date);
+
+                this.dateCreateDialog = date
+                this.createDialog = true
+
+                // const updatedEvent = {
+                //     id:consultation.id,
+                //     title:`${nom} : ${email}`,
+                //     start:date,
+                //     end:end,
+                //     typeid:consultation.typeid,
+                //     eventType:'consultation_updated',
+                //     class:'consultation_updated'
+                // }
             },
             async updateConsultation(consultation)
             {
@@ -128,24 +126,55 @@ import timeSlotsService from '@/services/TimeSlotsService';
                 const end = new Date(consultation.start)
                 end.setMinutes(consultation.start.getMinutes()+duration)
 
-                const newEvent = {
+                const updatedEvent = {
                     id:consultation.id,
                     title:`${nom} : ${email}`,
                     start:consultation.start,
                     end:end,
                     typeid:consultation.typeid,
-                    eventType:'consultation',
-                    class:'consultation'
+                    eventType:'consultation_updated',
+                    class:'consultation_updated'
                 }
 
                 // console.log("new event : "+JSON.stringify(newEvent));
 
                 this.events.splice(consultationEventIndex,1)
-                this.events.push(newEvent)
+                this.events.push(updatedEvent)
 
                 this.consultationsToUpdate.push(consultation)
                 
                 this.modifyDialog = false
+            },
+            deleteConsultation(id)
+            {
+                const i = this.events.findIndex((x)=>x.id==id)
+                this.events.splice(i,1)
+
+                this.consultationIdsToDelete.push(id)
+
+                this.modifyDialog = false
+            },
+            eventDropped(event)
+            {
+                console.log(JSON.stringify(event));
+                
+            },
+            generateUniqueId()
+            {
+                var id = 1
+                var idIsUnique = false
+                while(!idIsUnique)
+                {
+                    const eventWithId = this.events.find((x)=>{
+                        return x.id == id
+                    })
+
+                    idIsUnique = eventWithId == null
+
+                    if(!idIsUnique)
+                        id++
+                }
+                return id
             }
         }
 

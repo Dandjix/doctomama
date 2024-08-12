@@ -5,6 +5,7 @@
         color="primary"
         v-model="selected"
         :clearable="clearable"
+        :rules="rules"
 
     ></v-combobox>
     <!-- <h1>
@@ -51,6 +52,10 @@
             clearable:{
                 type:Boolean,
                 default:false
+            },
+            rules:{
+                type:Array,
+                default:()=>[]
             }
 
         },

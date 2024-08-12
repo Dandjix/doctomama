@@ -1,11 +1,16 @@
 <template>
-    <vue-cal class="calendar" 
+    <vue-cal class="calendar vuecal--full-height-delete"
     :events="events"
     :time-from="min"
     :time-to="max"
     :locale="fr"
-    :on-event-click="eventClicked">
-    </vue-cal>
+    :on-event-click="eventClicked"
+    @cell-click="cellClicked"
+    :editable-events="{ title: false, drag: true, resize: false, delete: true, create: false }"
+    
+    @event-drop="eventDropped"
+    @event-delete="eventDeleted"
+    ></vue-cal>
 </template>
 
 <style scoped>
@@ -15,8 +20,20 @@
     >>>.vuecal__event.vacation {background-color: rgba(253, 156, 66, 0.9);border: 1px solid rgb(233, 136, 46);color: #fff;}
 
     >>>.vuecal__event.consultation {
-        background-color: green;
-        border: 1px solid rgb(5, 99, 0);
+        background-color: rgb(0, 159, 212);
+        border: 1px solid rgb(0, 116, 193);
+        color: white;
+    }
+
+    >>>.vuecal__event.consultation_updated {
+        background-color: yellow;
+        border: 1px solid rgb(233, 233, 0);
+        color: black;
+    }
+
+    >>>.vuecal__event.consultation_new {
+        background-color: rgb(6, 177, 0);
+        border: 1px solid rgb(59, 154, 0);
         color: white;
     }
 
@@ -82,15 +99,37 @@ import VueCal from 'vue-cal';
                 this.max = max
             }
         },
-        emits:['consultationClick'],
+        emits:['consultationClick','eventDropped','eventDeleted','cellClicked'],
         methods:
         {
             eventClicked(event)
             {
-                if(!event || event.eventType!="consultation")
+                if(!event || !event.eventType.startsWith("consultation"))
                     return
                 // console.log("clicked at : "+JSON.stringify(event));
                 this.$emit('consultationClick',event.id)
+            },
+            eventDropped(event)
+            {
+                this.$emit('eventDropped',event)
+            },
+            eventDeleted(event)
+            {
+                this.$emit('eventDeleted',event.id)
+            },
+            cellClicked(date)
+            {
+                // console.log(typeof date);
+                
+                if(!(date instanceof Date))
+                {
+                    // console.log("not a date");
+                    
+                    return
+                }
+                // console.log("date : "+JSON.stringify(date));
+
+                this.$emit('cellClicked',date)
             }
         }
     }
