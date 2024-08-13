@@ -44,12 +44,16 @@
                 </v-card-text>
 
                 <v-card-actions class="mr-10">
-                    <v-row>
-                        <v-spacer></v-spacer>
-                        <v-btn @click="resetConsultation" color="yellow-darken-4">Réinitialiser</v-btn>
-                        <v-btn @click="deleteConsultation" color="error">Supprimer</v-btn>
-                        <v-btn color="primary" type="submit">Confirmer les modifications</v-btn>
-                        <!-- <v-spacer></v-spacer> -->
+                    <v-row justify="end">
+                        <v-col cols="3">
+                            <v-btn @click="resetConsultation" color="yellow-darken-4" block>Réinitialiser</v-btn>
+                        </v-col>
+                        <v-col cols="3">
+                            <v-btn @click="deleteConsultation" color="error" block>Supprimer</v-btn>
+                        </v-col>
+                        <v-col cols="3">
+                            <v-btn color="primary" type="submit" block>Confirmer les modifications</v-btn>
+                        </v-col>
                     </v-row>
 
                 </v-card-actions>

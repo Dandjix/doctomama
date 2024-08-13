@@ -188,15 +188,39 @@ import consultationsService from '@/services/ConsultationsService';
             },
             async resetConsultation(id)
             {
+                const event = this.events.find((x)=>x.id==id)
                 const consultationEventIndex = this.events.findIndex((x)=>x.id==id)
-                const consultationsToCreateIndex = this.consultationsToCreate.findIndex((x)=>x.id==id)
 
-                if(consultationsToCreateIndex>=0)
+                if(event.eventType=="consultation_new")
                 {
+                    const consultationsToCreateIndex = this.consultationsToCreate.findIndex((x)=>x.id==id)
+
                     this.consultationsToCreate.splice(consultationsToCreateIndex,1)
                     this.events.splice(consultationEventIndex,1)
+                }
+                else if (event.eventType=="consultation")
+                {
                     this.modifyDialog = false
-                    return
+                }
+                else //if (event.eventType=="consultation_updated")
+                {
+                    // console.log("updated");
+                    
+                    const consultationsToUpdateIndex = this.consultationsToUpdate.findIndex((x)=>x.id==id)
+
+                    this.consultationsToUpdate.splice(consultationsToUpdateIndex,1)
+                    this.events.splice(consultationEventIndex,1)
+
+                    var original = await consultationsService.getConsultationById(this.session,id)
+                    original = {...original,id:id}
+
+                    const [event] = toConsultationEvents([original])
+
+                    this.events.push(event)
+                    this.modifyDialog = false
+
+                    // console.log("done");
+                    
                 }
 
                 this.modifyDialog = false
