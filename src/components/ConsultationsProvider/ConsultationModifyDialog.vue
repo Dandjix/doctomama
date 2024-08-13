@@ -7,11 +7,22 @@
                     <v-row>
 
                         <v-col cols="12" md="6" >
-                            <v-text-field disabled v-model="email" label="email" ></v-text-field>
+                            <!-- <v-text-field :disabled="consultation.eventType!='consultation_new'" 
+                                v-model="email" 
+                                label="email" 
+                                :rules="rulesEmail"></v-text-field> -->
+                            <EmailSearchField 
+                            v-model="email" 
+                            :rules="rulesEmail"
+                            :disabled="consultation.eventType!='consultation_new'" 
+                            label="email" ></EmailSearchField>
                         </v-col>
 
                         <v-col cols="12" md="6" >
-                            <v-text-field disabled v-model="telephone" label="téléphone" ></v-text-field>
+                            <v-text-field :disabled="consultation.eventType!='consultation_new'" 
+                                v-model="telephone" 
+                                label="téléphone" 
+                                :rules="rulesTelephone"></v-text-field>
                         </v-col>
 
                         <v-col cols="12" md="12" >
@@ -51,6 +62,7 @@
     import dateUtils from '@/utils/date'
     import ConsultationsTypeSelect from '../Consultations/ConsultationsTypeSelect.vue';
     import TimeAndDatePicker from '../Utility/TimeAndDatePicker.vue';
+    import EmailSearchField from '../Utility/EmailSearchField.vue';
     // import { VTimePicker } from 'vuetify/labs/VTimePicker'
     // import { VDateInput } from 'vuetify/labs/VDateInput'
     import consultationTypesService from '@/services/ConsultationTypesService';
@@ -62,7 +74,8 @@
         name:"ConsultationModifyDialog",
         components:{
             ConsultationsTypeSelect,
-            TimeAndDatePicker
+            TimeAndDatePicker,
+            EmailSearchField
         },
         props:{
             consultation:{
@@ -110,7 +123,7 @@
                 this.minHour = min
                 this.maxHour = max
 
-                console.log("min and max set : "+this.minHour+", "+this.maxHour);
+                // console.log("min and max set : "+this.minHour+", "+this.maxHour);
             },
             async typeConsultation(newValue)
             {
@@ -267,6 +280,8 @@
                 rulesConsultationType:consultationRules.rulesConsultationType,
                 rulesDate:consultationRules.rulesDate,
                 rulesTimePicker:consultationRules.rulesTimePicker,
+                rulesEmail:consultationRules.rulesEmail,
+                rulesTelephone:consultationRules.rulesTelephone
             }
         }
     }
