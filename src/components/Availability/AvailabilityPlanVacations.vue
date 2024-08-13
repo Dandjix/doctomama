@@ -55,9 +55,9 @@
   </template>
   
   <style scoped>
-  >>>.vuecal__event.leisure {background-color: rgba(253, 156, 66, 0.9);border: 1px solid rgb(233, 136, 46);color: #fff;}
+  :deep(vuecal__event.leisure) {background-color: rgba(253, 156, 66, 0.9);border: 1px solid rgb(233, 136, 46);color: #fff;}
 
-  >>>.vuecal__cell-events-count {    background: #fd9c42;}
+  :deep(vuecal__cell-events-count) {    background: #fd9c42;}
 
 </style>
 

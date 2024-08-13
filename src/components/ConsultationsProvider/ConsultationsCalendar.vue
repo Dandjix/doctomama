@@ -17,38 +17,43 @@
     .calendar{
         height: 500px;
     }
-    >>>.vuecal__event.vacation {background-color: rgba(253, 156, 66, 0.9);border: 1px solid rgb(233, 136, 46);color: #fff;}
+    :deep(.vuecal__event.vacation) {
+        background-color: rgba(253, 156, 66, 0.9);
+        border: 1px solid rgb(233, 136, 46);
+        color: #fff;
+    }
 
-    >>>.vuecal__event.consultation {
+    :deep(.vuecal__event.consultation) {
         background-color: rgb(0, 159, 212);
         border: 1px solid rgb(0, 116, 193);
         color: white;
     }
 
-    >>>.vuecal__event.consultation_updated {
+    :deep(.vuecal__event.consultation_updated) {
         background-color: yellow;
         border: 1px solid rgb(233, 233, 0);
         color: black;
     }
 
-    >>>.vuecal__event.consultation_new {
+    :deep(.vuecal__event.consultation_new) {
         background-color: rgb(6, 177, 0);
         border: 1px solid rgb(59, 154, 0);
         color: white;
     }
 
-    >>>.vuecal__event.timeSlot {
+    :deep(.vuecal__event.timeSlot) {
         background-color: rgb(21, 0, 143);
         border: 1px solid rgb(5, 0, 99);
         color: white;
     }
 
-    >>>.vuecal__cell-events-count {    background: #fd9c42;}
+    :deep(.vuecal__cell-events-count) {    background: #fd9c42;}
 
 </style>
 
 <script>
-    import SettingsService from '@/services/SettingsService';
+    // import SettingsService from '@/services/SettingsService';
+import SettingsService from '@/services/SettingsService';
 import VueCal from 'vue-cal';
 
     const fr = {
@@ -75,11 +80,13 @@ import VueCal from 'vue-cal';
         {
             VueCal
         },
-        data()
+        async data()
         {
+            const minHour = await SettingsService.getSetting('heure_debut_calendrier')
+            const maxHour = await SettingsService.getSetting('heure_fin_calendrier')
             return{
-                min:0,
-                max:60*24,
+                min:minHour,
+                max:maxHour,
                 fr
             }
         },
@@ -92,12 +99,12 @@ import VueCal from 'vue-cal';
         },
         watch:
         {
-            async events(newValue)
-            {
-                const {min,max} = await getMinAndMax(newValue)
-                this.min = min
-                this.max = max
-            }
+            // async events()
+            // {
+            //     // const {min,max} = await getMinAndMax(newValue)
+            //     this.min = "08:00"
+            //     this.max = "18:00"
+            // }
         },
         emits:['consultationClick','eventDropped','eventDeleted','cellClicked'],
         methods:
@@ -134,42 +141,46 @@ import VueCal from 'vue-cal';
         }
     }
 
-    async function getMinAndMax(events)
-    {
-        var settingsMin = await SettingsService.getSetting('heure_debut_calendrier')
-        var settingsMax = await SettingsService.getSetting('heure_fin_calendrier')
+    // async function getMinAndMax(events)
+    // {
+    //     var settingsMin = await SettingsService.getSetting('heure_debut_calendrier')
+    //     var settingsMax = await SettingsService.getSetting('heure_fin_calendrier')
 
-        settingsMax = hourToMinutes(settingsMax)
-        settingsMin = hourToMinutes(settingsMin)
-        // console.log("sm : "+JSON.stringify(settingsMin));
+    //     settingsMax = hourToMinutes(settingsMax)
+    //     settingsMin = hourToMinutes(settingsMin)
+    //     // console.log("sm : "+JSON.stringify(settingsMin));
 
-        var min = 60*24
-        var max = 0
-        // console.log("new value for events : "+newValue);
-        for (let i = 0; i < events.length; i++) {
-            const event = events[i];
-            const startMin = event.start.getHours()*60+event.start.getMinutes()
-            const endMin = event.end.getHours()*60+event.end.getMinutes()
-            if(startMin<min)
-                min = startMin
-            if(endMin>max)
-                max = endMin
-        }
-        // console.log("min : "+min);
+    //     var min = 60*24
+    //     var max = 0
+    //     // console.log("new value for events : "+newValue);
+    //     for (let i = 0; i < events.length; i++) {
+    //         const event = events[i];
+    //         if(!(event.start instanceof Date) || !(event.end instanceof Date))
+    //         {
+    //             continue
+    //         }
+    //         const startMin = event.start.getHours()*60+event.start.getMinutes()
+    //         const endMin = event.end.getHours()*60+event.end.getMinutes()
+    //         if(startMin<min)
+    //             min = startMin
+    //         if(endMin>max)
+    //             max = endMin
+    //     }
+    //     // console.log("min : "+min);
         
 
-        min = Math.min(min,settingsMin)
-        max = Math.max(max,settingsMax)
-        return {min,max}
-    }
+    //     min = Math.min(min,settingsMin)
+    //     max = Math.max(max,settingsMax)
+    //     return {min,max}
+    // }
 
-    function hourToMinutes(hour)
-    {
-        const [hours,minutes] = hour.split(":")
+    // function hourToMinutes(hour)
+    // {
+    //     const [hours,minutes] = hour.split(":")
 
-        // console.log("h : "+hours+", m : "+minutes);
+    //     // console.log("h : "+hours+", m : "+minutes);
         
 
-        return Number(hours)*60+Number(minutes)
-    }
+    //     return Number(hours)*60+Number(minutes)
+    // }
 </script>

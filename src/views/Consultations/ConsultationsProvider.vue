@@ -1,5 +1,8 @@
 <template>
     <h1>Consultations !</h1>
+
+    <TimeStepSelector v-model="step"></TimeStepSelector>
+
     <ConsultationsCalendar 
     @consultationClick="consultationClicked" 
     @cellClicked="cellClicked"
@@ -7,6 +10,8 @@
     @eventDeleted="deleteConsultation"
     @eventDropped="eventDropped"
     :events="events"></ConsultationsCalendar>
+
+    <!-- <TimeStepSelector v-model="step"></TimeStepSelector> -->
 
     <ConsultationModifyDialog 
     v-model="modifyDialog" 
@@ -32,7 +37,7 @@
             <v-btn block color="primary" :disabled="!modified()" @click="save">Sauvegarder</v-btn>
         </v-col>
     </v-row>
-    <h1>debug</h1>
+    <!-- <h1>debug</h1>
 
     {{ consultationsToCreate }}
 
@@ -42,7 +47,7 @@
 
     <br>
 
-    {{ consultationsToUpdate }}
+    {{ consultationsToUpdate }} -->
 
 
 </template>
@@ -52,13 +57,14 @@
     // import ConsultationsTypeSelect from '@/components/Consultations/ConsultationsTypeSelect.vue';
     import ConsultationModifyDialog from '@/components/ConsultationsProvider/ConsultationModifyDialog.vue';
     import ConsultationCreateDialog from '@/components/ConsultationsProvider/ConsultationCreateDialog.vue';
-
+    import TimeStepSelector from '@/components/Utility/TimeStepSelector.vue';
 
     import ConsultationsService from '@/services/ConsultationsService';
     import consultationTypesService from '@/services/ConsultationTypesService';
     import { mapState } from 'vuex';
     import ConsultationModifyOverlapDialog from '@/components/ConsultationsProvider/ConsultationModifyOverlapDialog.vue';
 import consultationsService from '@/services/ConsultationsService';
+import vacationsService from '@/services/VacationsService';
     // import consultationsService from '@/services/ConsultationsService';
 
     // import timeSlotsService from '@/services/TimeSlotsService';
@@ -66,7 +72,9 @@ import consultationsService from '@/services/ConsultationsService';
         name:"ConsultationsView",
         components:{
             ConsultationsCalendar,
-            // ConsultationsTypeSelect,
+
+            TimeStepSelector,
+
             ConsultationModifyDialog,
             ConsultationCreateDialog,
             ConsultationModifyOverlapDialog
@@ -79,11 +87,13 @@ import consultationsService from '@/services/ConsultationsService';
                 consultationsToUpdate:[],
                 consultationIdsToDelete:[],
                 consultationsToCreate:[],
+                vacations:[],
 
                 // consultationType:null,
 
                 modifyDialog:false,
                 consultationModifyDialog:null,
+                step:1,
 
                 createDialog:false,
                 dateCreateDialog:null,
@@ -111,7 +121,17 @@ import consultationsService from '@/services/ConsultationsService';
             {
                 const consults = toConsultationEvents( await ConsultationsService.getAllConsultations(this.session))
 
+                const vacations = await vacationsService.getVacationsRaw(this.session)
+                const vacationsEvents = toVacationEvents(vacations)
+                this.vacations = vacations
+
+
                 this.events = consults
+                this.events.push(...vacationsEvents)
+
+                // console.log("events : "+JSON.stringify(this.events));
+                
+                // this.events.push(...vacations)
                 this.consultationIdsToDelete = []
                 this.consultationsToCreate = []
                 this.consultationsToUpdate = []
@@ -328,9 +348,13 @@ import consultationsService from '@/services/ConsultationsService';
 
                 this.modifyDialog = false
             },
-            eventDropped(event)
+            eventDropped(req)
             {
-                console.log(JSON.stringify(event));
+                const event = req.event
+
+                this.applyStep(event.start)
+                // console.log("event : "+JSON.stringify(event));
+                this.updateConsultation(event)
                 
             },   
             generateUniqueId()
@@ -349,8 +373,18 @@ import consultationsService from '@/services/ConsultationsService';
                         id++
                 }
                 return id
+            } ,
+            applyStep(date)
+            {
+                const step = this.step
+                const rawMinutes = date.getHours()*60+date.getMinutes()
+                var roundedMinutes = Math.round(rawMinutes/step)*step
+                const roundedHours = Math.floor(roundedMinutes/60)
+                roundedMinutes = roundedMinutes % 60
+                date.setHours(roundedHours,roundedMinutes)
             }
-        }
+        },
+
 
     }
 
@@ -380,6 +414,47 @@ import consultationsService from '@/services/ConsultationsService';
         }
         )
 
+        return events
+    }
+
+    function toVacationEvents(vacations)
+    {
+
+        // console.log("vacations : "+JSON.stringify(vacations));
+        // return []
+
+        const events = vacations.map((vacation)=>
+        {
+            // const start = new Date(vacation)
+            // const end = new Date(vacation)
+            // end.setHours(23,59,59)
+            // console.log(vacation);
+            
+            return {
+                title: 'vacances',
+                content: '<i class="icon material-icons">beach_access</i>',
+
+                start: vacation,
+                end: vacation,
+
+                deletable: false,
+                // resizable: false,
+                draggable: false,
+
+                eventType:'vacation',
+                class:'vacation'
+            }
+        }
+        )
+
+        // const events = [
+        // {
+        // start: '2024-08-13',
+        // end: '2024-08-13',
+        // title: 'Need to go shopping',
+        // content: '<i class="icon material-icons">shopping_cart</i>',
+        // class: 'vacances'
+        // },]
         return events
     }
 

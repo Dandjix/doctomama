@@ -7,6 +7,10 @@ const vacationsService =
         const vacations = await getVacations(session)
         return toEvents(vacations)
     },
+    async getVacationsRaw(session)
+    {
+        return await getVacations(session)
+    },
     async setVacations(session,events)
     {
         try{
@@ -61,7 +65,8 @@ function toEvents(vacations)
             end: x,
             title: 'vacances',
             content: '<i class="icon material-icons">beach_access</i>',
-            class: 'leisure'
+            class: 'leisure',
+            eventType:'vacation'
           })
     )
     // console.log("res : "+JSON.stringify(events));

@@ -71,9 +71,6 @@ const consultationsService = {
         // console.log(JSON.stringify(toUpdate));
         
         try{
-
-            
-            
             return await updateConsultations(session,toAdd,toDelete,toUpdate)
         }
         catch(e){
