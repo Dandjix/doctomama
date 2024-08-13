@@ -11,17 +11,40 @@
     <ConsultationModifyDialog 
     v-model="modifyDialog" 
     :consultation="consultationModifyDialog" 
+    @reset="resetConsultation"
     @update="updateConsultation"
     @delete="deleteConsultation"
     ></ConsultationModifyDialog>
 
     <ConsultationCreateDialog
     v-model="createDialog"
-    :date="dateCreateDialog"
+    :start-date="dateCreateDialog"
     @create="createConsultation"
     ></ConsultationCreateDialog>
 
     <ConsultationModifyOverlapDialog v-model="overlapDialog"></ConsultationModifyOverlapDialog>
+
+    <v-row>
+        <v-col cols="12" md="6">
+            <v-btn block color="yellow-darken-4" :disabled="!modified()" @click="reset">Réinitialiser</v-btn>
+        </v-col>
+        <v-col cols="12" md="6">
+            <v-btn block color="primary" :disabled="!modified()" @click="save">Sauvegarder</v-btn>
+        </v-col>
+    </v-row>
+    <h1>debug</h1>
+
+    {{ consultationsToCreate }}
+
+    <br>
+
+    {{ consultationIdsToDelete }}
+
+    <br>
+
+    {{ consultationsToUpdate }}
+
+
 </template>
 
 <script>
@@ -35,7 +58,9 @@
     import consultationTypesService from '@/services/ConsultationTypesService';
     import { mapState } from 'vuex';
     import ConsultationModifyOverlapDialog from '@/components/ConsultationsProvider/ConsultationModifyOverlapDialog.vue';
-    import consultationsService from '@/services/ConsultationsService';
+import consultationsService from '@/services/ConsultationsService';
+    // import consultationsService from '@/services/ConsultationsService';
+
     // import timeSlotsService from '@/services/TimeSlotsService';
     export default{
         name:"ConsultationsView",
@@ -75,18 +100,46 @@
         },
         async mounted()
         {
-           const consults = toConsultationEvents( await ConsultationsService.getAllConsultations(this.session))
-
-           this.events = consults
+            await this.reset()
         },
         methods:{
+            modified(){
+                const modified = this.consultationsToCreate.length>0 || this.consultationsToUpdate.length>0 ||this.consultationIdsToDelete.length>0
+                return modified
+            },
+            async reset()
+            {
+                const consults = toConsultationEvents( await ConsultationsService.getAllConsultations(this.session))
+
+                this.events = consults
+                this.consultationIdsToDelete = []
+                this.consultationsToCreate = []
+                this.consultationsToUpdate = []
+            },
+            async save()
+            {
+                // console.log("c : "+JSON.stringify(this.consultationsToCreate));
+                // console.log("d : "+JSON.stringify(this.consultationIdsToDelete));
+                // console.log("u : "+JSON.stringify(this.consultationsToUpdate));
+
+                await consultationsService.updateConsultations(this.session,
+                this.consultationsToCreate, this.consultationIdsToDelete,this.consultationsToUpdate)
+
+                await this.reset()
+            },
             async consultationClicked(id)
             {
-                // const consultation = {...(await ConsultationsService.getConsultationById(this.session,id)),id:id}
                 const consultation = this.events.find((x)=>{return x.id == id}) 
 
+                // console.log("cons : "+JSON.stringify(consultation));
+                
+
+                // console.log("eentType : "+consultation.eventType);
+                
                 // console.log("c : "+JSON.stringify(consultation));
-                if(consultation.eventType=="consultation")
+                if(consultation.eventType=="consultation" 
+                || consultation.eventType=="consultation_updated" 
+                || consultation.eventType=="consultation_new")
                 {
                     this.consultationModifyDialog = consultation
                     this.modifyDialog = true  
@@ -95,20 +148,58 @@
             },
             cellClicked(date)
             {
-                // console.log("clicked at date : "+date);
-
+                // console.log("date : "+JSON.stringify(date));
+                
                 this.dateCreateDialog = date
                 this.createDialog = true
+            },
+            async createConsultation(consultation)
+            {
+                // console.log("cons to create : "+JSON.stringify(consultation));
+                
+                const consultationType = await consultationTypesService.getConsultationType(consultation.typeid)
 
-                // const updatedEvent = {
-                //     id:consultation.id,
-                //     title:`${nom} : ${email}`,
-                //     start:date,
-                //     end:end,
-                //     typeid:consultation.typeid,
-                //     eventType:'consultation_updated',
-                //     class:'consultation_updated'
-                // }
+                const id = this.generateUniqueId()
+
+
+
+                const end = new Date(consultation.start)
+
+                end.setMinutes(end.getMinutes()+consultationType.duree_minutes)
+
+                const newEvent = {
+                    id:id,
+                    title:`${consultationType.nom} : ${consultation.email}`,
+                    email:consultation.email,
+                    telephone:consultation.telephone,
+                    start:consultation.start,
+                    end:end,
+                    typeid:consultation.typeid,
+                    eventType:'consultation_new',
+                    class:'consultation_new'
+                }
+
+                const consultationWithId = {...consultation,id:id}
+                this.consultationsToCreate.push(consultationWithId)
+
+                this.events.push(newEvent)
+
+                this.createDialog = false
+            },
+            async resetConsultation(id)
+            {
+                const consultationEventIndex = this.events.findIndex((x)=>x.id==id)
+                const consultationsToCreateIndex = this.consultationsToCreate.findIndex((x)=>x.id==id)
+
+                if(consultationsToCreateIndex>=0)
+                {
+                    this.consultationsToCreate.splice(consultationsToCreateIndex,1)
+                    this.events.splice(consultationEventIndex,1)
+                    this.modifyDialog = false
+                    return
+                }
+
+                this.modifyDialog = false
             },
             async updateConsultation(consultation)
             {
@@ -119,21 +210,56 @@
                 })
 
                 const {duree_minutes:duration,nom} = await consultationTypesService.getConsultationType(consultation.typeid)
-                console.log("duration : "+duration);
+                // console.log("duration : "+duration);
                 
-                const {email} = await consultationsService.getConsultationById(this.session,consultation.id)
+                // const {email,telephone} = await consultationsService.getConsultationById(this.session,consultation.id)
 
                 const end = new Date(consultation.start)
                 end.setMinutes(consultation.start.getMinutes()+duration)
 
+                var eventType
+
+                // console.log("et : "+consultation.eventType);
+                
+
+                if(consultation.eventType == 'consultation')
+                {
+                    // console.log("ok");
+                    
+                    eventType = 'consultation_updated'
+
+                    this.consultationsToUpdate.push(consultation)
+                }
+                else if(consultation.eventType == 'consultation_updated')
+                {
+                    eventType = 'consultation_updated'
+
+                    const index = this.consultationsToUpdate.findIndex((x)=>x.id==consultation.id)
+                    this.consultationsToUpdate.splice(index,1)
+                    this.consultationsToUpdate.push(consultation)
+                }
+                else // if consultation_new
+                {
+                    eventType = 'consultation_new'
+
+                    const index = this.consultationsToCreate.findIndex((x)=>x.id==consultation.id)
+                    this.consultationsToCreate.splice(index,1)
+                    this.consultationsToCreate.push(consultation)
+                }
+
+                // console.log("et : "+eventType);
+                
+
                 const updatedEvent = {
                     id:consultation.id,
-                    title:`${nom} : ${email}`,
+                    title:`${nom} : ${consultation.email}`,
+                    email:consultation.email,
+                    telephone:consultation.telephone,
                     start:consultation.start,
                     end:end,
                     typeid:consultation.typeid,
-                    eventType:'consultation_updated',
-                    class:'consultation_updated'
+                    eventType:eventType,
+                    class:eventType
                 }
 
                 // console.log("new event : "+JSON.stringify(newEvent));
@@ -141,16 +267,40 @@
                 this.events.splice(consultationEventIndex,1)
                 this.events.push(updatedEvent)
 
-                this.consultationsToUpdate.push(consultation)
+
                 
                 this.modifyDialog = false
             },
             deleteConsultation(id)
             {
-                const i = this.events.findIndex((x)=>x.id==id)
-                this.events.splice(i,1)
+                const consultation = this.events.find((x)=>x.id==id)
 
-                this.consultationIdsToDelete.push(id)
+                if(consultation.eventType=="consultation")
+                {
+                    const i = this.events.findIndex((x)=>x.id==id)
+                    this.events.splice(i,1)
+
+                    this.consultationIdsToDelete.push(id)
+                }
+                else if(consultation.eventType=="consultation_updated")
+                {
+                    const indexEvents = this.events.findIndex((x)=>x.id==id)
+                    this.events.splice(indexEvents,1)
+
+                    const indexToUpdate = this.consultationsToUpdate.findIndex((x)=>x.id==id)
+                    this.consultationsToUpdate.splice(indexToUpdate,1)
+
+                    this.consultationIdsToDelete.push(id)
+                }
+                else //if consultation_new
+                {
+                    const indexEvents = this.events.findIndex((x)=>x.id==id)
+                    this.events.splice(indexEvents,1)
+
+                    const indexToCreate = this.consultationsToCreate.findIndex((x)=>x.id==id)
+                    this.consultationsToCreate.splice(indexToCreate,1)
+                }
+
 
                 this.modifyDialog = false
             },
@@ -158,7 +308,7 @@
             {
                 console.log(JSON.stringify(event));
                 
-            },
+            },   
             generateUniqueId()
             {
                 var id = 1

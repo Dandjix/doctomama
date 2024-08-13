@@ -20,7 +20,7 @@
 
                         <!-- <v-col cols="12" md="6" class="d-flex justify-center"> -->
 
-                        <TimeAndDatePicker v-model="timeConsultation" class="mx-10"></TimeAndDatePicker>
+                        <TimeAndDatePicker v-model="timeConsultation" :min-hour="minHour" :max-hour="maxHourOffset" class="mx-10"></TimeAndDatePicker>
 
                         <!-- </v-col> -->
 
@@ -35,6 +35,7 @@
                 <v-card-actions class="mr-10">
                     <v-row>
                         <v-spacer></v-spacer>
+                        <v-btn @click="resetConsultation" color="yellow-darken-4">Réinitialiser</v-btn>
                         <v-btn @click="deleteConsultation" color="error">Supprimer</v-btn>
                         <v-btn color="primary" type="submit">Confirmer les modifications</v-btn>
                         <!-- <v-spacer></v-spacer> -->
@@ -97,6 +98,7 @@
 
                 this.email = newValue.email
                 this.telephone = newValue.telephone
+                this.eventType = newValue.eventType
 
                 const {duree_minutes:duration} = await consultationTypesService.getConsultationType(idType)
 
@@ -107,6 +109,8 @@
 
                 this.minHour = min
                 this.maxHour = max
+
+                console.log("min and max set : "+this.minHour+", "+this.maxHour);
             },
             async typeConsultation(newValue)
             {
@@ -175,7 +179,7 @@
                 }
             }
         },
-        emits:['update','delete'],
+        emits:['reset','update','delete'],
         methods:{
             formatDate(){
                 const date = this.consultation.start
@@ -211,7 +215,13 @@
                 const start = this.timeConsultation
 
                 
-                const consultation = {id:this.consultation.id,start:start,typeid:idType}
+                const consultation = {
+                    id:this.consultation.id,
+                    email:this.email,
+                    telephone:this.telephone,
+                    start:start,
+                    eventType:this.eventType,
+                    typeid:idType}
 
                 this.$emit('update',consultation)
             },
@@ -219,6 +229,11 @@
             {
                 const id = this.consultation.id
                 this.$emit('delete',id)
+            },
+            resetConsultation()
+            {
+                const id = this.consultation.id
+                this.$emit('reset',id)
             },
             hourConsultationUpdateHour(value)
             {
@@ -241,12 +256,13 @@
                 typeConsultation:null,
                 timeConsultation:null,
 
-                minHour:"00:00:00",
-                maxHour:"23:59:59",
+                minHour:"00:00",
+                maxHour:"23:59",
 
                 duration:0,
                 email:"",
                 telephone:"",
+                eventType:"",
 
                 rulesConsultationType:consultationRules.rulesConsultationType,
                 rulesDate:consultationRules.rulesDate,

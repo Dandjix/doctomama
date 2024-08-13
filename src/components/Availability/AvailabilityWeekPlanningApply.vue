@@ -60,7 +60,7 @@
       </v-row>
       <v-row>
         <v-spacer/>
-        <v-btn color="yellow" @click="dialogVisible=false">Revenir en arrière</v-btn>
+        <v-btn color="yellow-darken-4" @click="dialogVisible=false">Revenir en arrière</v-btn>
         <v-spacer/>
       </v-row>
     </v-card>

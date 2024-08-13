@@ -24,8 +24,8 @@
                 @update:hour="updateHoursHour"
                 @update:minute="updateHoursMinute"
 
-                :min="min"
-                :max="max"
+                :min="minHour"
+                :max="maxHour"
 
                 ></v-time-picker>
 
@@ -53,13 +53,13 @@
                 type:String,
                 default:"hours label"
             },
-            minMinutes:{
-                type:Number,
-                default:0
+            minHour:{
+                type:String,
+                default:"00:00"
             },
-            maxMinutes:{
-                type:Number,
-                default:1440
+            maxHour:{
+                type:String,
+                default:"23:59"
             },
             minDate:{
                 type:Date,
@@ -92,22 +92,22 @@
                     this.$emit('update:modelValue',value)
                 }
             },
-            min:{
-                get()
-                {
-                    const hours = Math.floor(this.minMinutes/60)
-                    const minutes = this.minMinutes%60
-                    return `${hours}:${minutes}`
-                }
-            },
-            max:{
-                get()
-                {
-                    const hours = Math.floor(this.maxMinutes/60)
-                    const minutes = this.maxMinutes%60
-                    return `${hours}:${minutes}`
-                }
-            }
+            // min:{
+            //     get()
+            //     {
+            //         const hours = Math.floor(this.minMinutes/60)
+            //         const minutes = this.minMinutes%60
+            //         return `${hours}:${minutes}`
+            //     }
+            // },
+            // max:{
+            //     get()
+            //     {
+            //         const hours = Math.floor(this.maxMinutes/60)
+            //         const minutes = this.maxMinutes%60
+            //         return `${hours}:${minutes}`
+            //     }
+            // }
         },
         methods:{
             // setTime(time)

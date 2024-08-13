@@ -29,7 +29,7 @@ function convertDateToDate(date)
 
     const res = `${year}-${zeroPad(month)}-${zeroPad(day)}`
 
-    console.log("converted : "+JSON.stringify(date)+" to : "+res);
+    // console.log("converted : "+JSON.stringify(date)+" to : "+res);
     
 
     return res

@@ -52,7 +52,7 @@
       <v-spacer/>
       <v-btn color="error" :disabled="sending||loading" @click="empty">Vider</v-btn>
       <v-spacer/>
-      <v-btn color="yellow" :disabled="sending||loading||!changed" @click="reset">Réinitialiser</v-btn>
+      <v-btn color="yellow-darken-4" :disabled="sending||loading||!changed" @click="reset">Réinitialiser</v-btn>
       <v-spacer/>
       <v-btn color="primary" :disabled="sending||loading||!changed" @click="save">Sauvegarder</v-btn>
       <v-spacer/>

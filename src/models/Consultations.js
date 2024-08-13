@@ -31,9 +31,12 @@ const getConsultationById = async (session,id) =>
 
 const createConsultation = async (email,telephone,consultationTypeId,start) =>
 {
-    // console.log("start : "+JSON.stringify(start));
+    // console.log("start b (c): "+start);
 
     start = convertDateToTime(start)
+
+    // console.log("start a (c) : "+start);
+    
 
     // console.log("start conv : "+start);
     
@@ -41,6 +44,33 @@ const createConsultation = async (email,telephone,consultationTypeId,start) =>
     console.log("url : "+url);
     
     await axios.post(url)
+}
+
+const updateConsultations = async (session,toAdd,toDelete,toUpdate) =>{
+
+    // console.log("before"+JSON.stringify(toAdd));
+    // console.log("toAdd: "+JSON.stringify(toAdd));
+    for (let i = 0; i < toAdd.length; i++) {
+        const element = toAdd[i];
+        element.start = convertDateToTime(element.start)
+        
+    }
+    for (let i = 0; i < toUpdate.length; i++) {
+        const element = toUpdate[i];
+        element.start = convertDateToTime(element.start)
+        
+    }
+    // console.log("after : "+JSON.stringify(toAdd));
+
+    const body = {
+        "toAdd":toAdd,
+    
+        "toDelete":toDelete,
+    
+        "toUpdate":toUpdate
+    }
+    const url = `${BASE_URL}/consultations/update?session=${session}`
+    await axios.post(url,body)
 }
 
 const sendCancelConsultationEmail = async (email,consultationId) =>
@@ -95,6 +125,7 @@ export {
     getConsultationById,
 
     createConsultation,
+    updateConsultations,
 
     sendCancelConsultationEmail,
     getDeletionCooldown,

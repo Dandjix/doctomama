@@ -8,6 +8,7 @@ import {
     sendCancelConsultationEmail,
     getDeletionCooldown,
     deleteConsultation,
+    updateConsultations,
     } 
 from '../models/Consultations'
 
@@ -63,6 +64,23 @@ const consultationsService = {
             throw e
         }
     },
+    async updateConsultations(session,toAdd,toDelete,toUpdate)
+    {
+        // console.log(JSON.stringify(toAdd));
+        // console.log(JSON.stringify(toDelete));
+        // console.log(JSON.stringify(toUpdate));
+        
+        try{
+
+            
+            
+            return await updateConsultations(session,toAdd,toDelete,toUpdate)
+        }
+        catch(e){
+            console.error("could not update consultations : "+e);
+            throw e
+        }
+    },
     async sendCancelConsultationEmail(email,consultationId)
     {
         try
@@ -95,6 +113,13 @@ const consultationsService = {
 
     }
 }
+
+// function stringifyDate(date)
+// {
+//     var res = JSON.stringify(date)
+//     res = res.substring(1,res.length-1)
+//     return res
+// }
 
 // function toConsultationEvents(consultations)
 // {
