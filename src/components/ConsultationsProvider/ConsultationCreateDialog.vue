@@ -19,7 +19,12 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <TimeAndDatePicker v-model="dateConsultation" :min-hour="minHour" :max-hour="maxHourOffset" :min-date="minDate"></TimeAndDatePicker>
+                        <TimeAndDatePicker 
+                        v-model="dateConsultation" 
+                        :min-hour="minHour" 
+                        :max-hour="maxHourOffset" 
+                        :min-date="minDate"
+                        :disabled-dates="disabledDates"></TimeAndDatePicker>
                     </v-row>
                 </v-card-text>
 
@@ -65,6 +70,10 @@
             modelValue:{
                 type:Boolean,
                 required:true
+            },
+            disabledDates:{
+                type:Array,
+                default:()=>[]
             }
         },
         watch:{

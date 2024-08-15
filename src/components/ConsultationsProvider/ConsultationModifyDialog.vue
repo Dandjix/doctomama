@@ -31,7 +31,12 @@
 
                         <!-- <v-col cols="12" md="6" class="d-flex justify-center"> -->
 
-                        <TimeAndDatePicker v-model="timeConsultation" :min-hour="minHour" :max-hour="maxHourOffset" :disabled-date="disabledDates" class="mx-10"></TimeAndDatePicker>
+                        <TimeAndDatePicker 
+                        v-model="timeConsultation" 
+                        :min-hour="minHour" 
+                        :max-hour="maxHourOffset" 
+                        :min-date="minDate"
+                        :disabledDates="disabledDates" class="mx-10"></TimeAndDatePicker>
 
                         <!-- </v-col> -->
 
@@ -41,6 +46,11 @@
                         <p>{{consultation.title}} - {{formatDate()}}</p>
                         <v-spacer></v-spacer>
                     </v-row>
+
+                    <!-- <v-row>
+                        <h1>debug MDD</h1>
+                        {{ disabledDates }}
+                    </v-row> -->
                 </v-card-text>
 
                 <v-card-actions class="mr-10">
@@ -273,12 +283,16 @@
             }
         },
         data(){
+            const minDate = new Date()
+            minDate.setHours(0,0,0,0)
             return{
                 typeConsultation:null,
                 timeConsultation:null,
 
                 minHour:"00:00",
                 maxHour:"23:59",
+
+                minDate:minDate,
 
                 duration:0,
                 email:"",

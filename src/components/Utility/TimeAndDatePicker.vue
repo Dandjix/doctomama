@@ -32,7 +32,13 @@
                 ></v-time-picker>
 
         </v-col>
+        <!-- <v-col>
+            <h1>debug</h1>
+            {{ disabledDates }}
+        </v-col> -->
     </v-row>
+
+
 </template>
 
 <script>
@@ -167,11 +173,45 @@
                 this.updateHours(`${hour}:${minutes}`)
             },
             checkAllowedDates(date){ 
-                // console.log("date : "+JSON.stringify());
+                // console.log("date : "+JSON.stringify(date));
                 const time = date.getTime()
-                return !this.disabledDates.some((x)=>new Date(x).getTime()==time)
+                // console.log("time : "+time);
+
+                // console.log("disabled dates : "+JSON.stringify(this.disabledDates));
+                
+                
+                const isInDisabledDates = this.disabledDates.some(
+                    (x)=>{
+                        // console.log("x : "+x);
+                        
+                        // const disabledDate = new Date(x)
+                        // console.log("dd : "+disabledDate);
+                        
+                        // disabledDate.setHours(0,0,0,0)
+                        // console.log("dd after"+disabledDate)
+                        const disabledDate = stringToDate(x)
+                        
+                        const inDisabled = disabledDate.getTime()==time
+                        return inDisabled;
+                    })
+                // console.log("in disabled ? "+isInDisabledDates);
+                
+                return !isInDisabledDates
                 // return false
             }
         }
+    }
+
+    function stringToDate(dateString)
+    {
+        const date = new Date()
+        const [year,month,day] = dateString.split("-")
+        date.setFullYear(year,Number(month)-1,day)
+        date.setHours(0,0,0,0)
+
+        // console.log("date : "+date+", from : "+dateString);
+        
+
+        return date
     }
 </script>

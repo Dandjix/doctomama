@@ -11,6 +11,8 @@
     @event-drop="eventDropped"
     @event-delete="eventDeleted"
     :disable-days="disabledDates"
+
+    :min-date="minDate"
     ></vue-cal>
     <h1>values</h1>
     {{ min_minutes }}
@@ -87,10 +89,13 @@ import VueCal from 'vue-cal';
         },
         data()
         { 
+            const minDate = new Date()
+            minDate.setHours(0,0,0,0)
             return{
                 fr,
                 min_minutes:480,
-                max_minutes:1024
+                max_minutes:1024,
+                minDate:minDate
             }
         },
         async mounted()
