@@ -10,6 +10,7 @@
     
     @event-drop="eventDropped"
     @event-delete="eventDeleted"
+    :disable-days="disabledDates"
     ></vue-cal>
 </template>
 
@@ -85,9 +86,9 @@ import VueCal from 'vue-cal';
             const minHour = await SettingsService.getSetting('heure_debut_calendrier')
             const maxHour = await SettingsService.getSetting('heure_fin_calendrier')
             return{
+                fr,
                 min:minHour,
-                max:maxHour,
-                fr
+                max:maxHour
             }
         },
         props:
@@ -95,6 +96,10 @@ import VueCal from 'vue-cal';
             events:{
                 type:Array,
                 required:true
+            },
+            disabledDates:{
+                type:Array,
+                default:()=>[]
             }
         },
         watch:

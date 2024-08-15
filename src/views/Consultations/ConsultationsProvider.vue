@@ -9,13 +9,15 @@
 
     @eventDeleted="deleteConsultation"
     @eventDropped="eventDropped"
-    :events="events"></ConsultationsCalendar>
+    :events="events"
+    :disabled-dates="vacations"></ConsultationsCalendar>
 
     <!-- <TimeStepSelector v-model="step"></TimeStepSelector> -->
 
     <ConsultationModifyDialog 
     v-model="modifyDialog" 
     :consultation="consultationModifyDialog" 
+    :disabled-dates="vacations"
     @reset="resetConsultation"
     @update="updateConsultation"
     @delete="deleteConsultation"
@@ -24,6 +26,7 @@
     <ConsultationCreateDialog
     v-model="createDialog"
     :start-date="dateCreateDialog"
+    :disabled-dates="vacations"
     @create="createConsultation"
     ></ConsultationCreateDialog>
 

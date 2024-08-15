@@ -10,6 +10,8 @@
                 placeholder="jj/mm/aaaa"
                 @update:model-value="updateDate"
 
+                :allowed-dates="checkAllowedDates"
+
                 :min="minDate"
                 :max="maxDate"
                 ></v-date-picker>
@@ -68,6 +70,10 @@
             maxDate:{
                 type:Date,
                 default:new Date('9999-01-01')
+            },
+            disabledDates:{
+                type:Array,
+                default:()=>[]
             }
         },
         data(){
@@ -110,23 +116,6 @@
             // }
         },
         methods:{
-            // setTime(time)
-            // {
-            //     const date = new Date(time)
-            //     date.setHours(0,0,0,0)
-            //     const hours = `${time.getHours()}:${time.getMinutes()}`
-
-            //     this.date = date
-            //     this.hours = hours
-            // },
-            // getTime()
-            // {
-            //     const [hours,minutes] = this.hour.split(':')
-            //     const date = new Date(this.date)
-            //     date.setHours(hours,minutes)
-
-            //     return date
-            // },
             updateDate(newValue)
             {
                 // console.log("upd d");
@@ -176,6 +165,12 @@
 
                 
                 this.updateHours(`${hour}:${minutes}`)
+            },
+            checkAllowedDates(date){ 
+                // console.log("date : "+JSON.stringify());
+                const time = date.getTime()
+                return !this.disabledDates.some((x)=>new Date(x).getTime()==time)
+                // return false
             }
         }
     }

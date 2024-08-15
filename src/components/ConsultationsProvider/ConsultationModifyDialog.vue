@@ -31,7 +31,7 @@
 
                         <!-- <v-col cols="12" md="6" class="d-flex justify-center"> -->
 
-                        <TimeAndDatePicker v-model="timeConsultation" :min-hour="minHour" :max-hour="maxHourOffset" class="mx-10"></TimeAndDatePicker>
+                        <TimeAndDatePicker v-model="timeConsultation" :min-hour="minHour" :max-hour="maxHourOffset" :disabled-date="disabledDates" class="mx-10"></TimeAndDatePicker>
 
                         <!-- </v-col> -->
 
@@ -89,6 +89,10 @@
             modelValue:{
                 type:Boolean,
                 required:true
+            },
+            disabledDates:{
+                type:Array,
+                default:()=>[]
             }
         },
         watch:{
