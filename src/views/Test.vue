@@ -2,7 +2,9 @@
     <vue-cal 
     style="height: 500px;" 
     :events="events"
-    :time="false"
+
+    :time-from="min"
+    :time-to="max"
     ></vue-cal>
 </template>
 
@@ -31,7 +33,10 @@
                     content: '<i class="icon material-icons">shopping_cart</i>',
                     class: 'leisure'
                 },
-            ]
+                ],
+                min:480,
+                max:1000
+
             }
         }
     }

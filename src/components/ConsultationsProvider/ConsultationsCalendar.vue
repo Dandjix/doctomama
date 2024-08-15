@@ -1,8 +1,8 @@
 <template>
     <vue-cal class="calendar vuecal--full-height-delete"
     :events="events"
-    :time-from="min"
-    :time-to="max"
+    :time-from="min_minutes"
+    :time-to="max_minutes"
     :locale="fr"
     :on-event-click="eventClicked"
     @cell-click="cellClicked"
@@ -12,6 +12,10 @@
     @event-delete="eventDeleted"
     :disable-days="disabledDates"
     ></vue-cal>
+    <h1>values</h1>
+    {{ min_minutes }}
+    {{ max_minutes }}
+    <h1>bottom text</h1>
 </template>
 
 <style scoped>
@@ -81,15 +85,31 @@ import VueCal from 'vue-cal';
         {
             VueCal
         },
-        async data()
-        {
-            const minHour = await SettingsService.getSetting('heure_debut_calendrier')
-            const maxHour = await SettingsService.getSetting('heure_fin_calendrier')
+        data()
+        { 
             return{
                 fr,
-                min:minHour,
-                max:maxHour
+                min_minutes:480,
+                max_minutes:1024
             }
+        },
+        async mounted()
+        {
+            const min = await SettingsService.getSetting('heure_debut_calendrier')
+            const max = await SettingsService.getSetting('heure_fin_calendrier')
+            // const min = "8:00"
+            // const max = "18:00"
+
+            const [minHours,minMinutes] = min.split(':')
+            const [maxHours,maxMinutes] = max.split(':')
+
+            const minSum = Number(minHours)*60+Number(minMinutes)
+            const maxSum = Number(maxHours)*60+Number(maxMinutes)
+
+            // console.log("minSum : "+minSum);
+            // console.log("maxSum : "+maxSum);
+            this.min_minutes = minSum
+            this.max_minutes = maxSum
         },
         props:
         {
