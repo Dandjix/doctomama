@@ -229,7 +229,7 @@ import { mapState } from 'vuex';
             },
             toBusinessHours(plages)
             {
-                console.log("plages : "+JSON.stringify(plages));
+                // console.log("plages : "+JSON.stringify(plages));
                 const businessHours = {
                     1:this.businessDay(0,plages),
                     2:this.businessDay(1,plages),
