@@ -12,6 +12,8 @@
     @event-delete="eventDeleted"
     :disable-days="disabledDates"
 
+    :special-hours="specialHours"
+
     :min-date="minDate"
     ></vue-cal>
     <h1>values</h1>
@@ -56,12 +58,21 @@
 
     :deep(.vuecal__cell-events-count) {    background: #fd9c42;}
 
+
+    .business-hours {
+        background-color: rgba(255, 255, 0, 0.15);
+        border: solid rgba(255, 210, 0, 0.3);
+        border-width: 2px 0;
+    }
+
 </style>
 
 <script>
     // import SettingsService from '@/services/SettingsService';
 import SettingsService from '@/services/SettingsService';
+import WeekPlanningService from '@/services/WeekPlanningService';
 import VueCal from 'vue-cal';
+import { mapState } from 'vuex';
 
     const fr = {
         "weekDays": ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"],
@@ -95,13 +106,22 @@ import VueCal from 'vue-cal';
                 fr,
                 min_minutes:480,
                 max_minutes:1024,
-                minDate:minDate
+                minDate:minDate,
+                specialHours: {
+
+                }
             }
+        },
+        computed:
+        {
+            ...mapState(['session'])
         },
         async mounted()
         {
             const min = await SettingsService.getSetting('heure_debut_calendrier')
             const max = await SettingsService.getSetting('heure_fin_calendrier')
+
+            this.specialHours = this.toBusinessHours(await WeekPlanningService.getPlagesHorairesRaw(this.session))
             // const min = "8:00"
             // const max = "18:00"
 
@@ -167,50 +187,46 @@ import VueCal from 'vue-cal';
                 // console.log("date : "+JSON.stringify(date));
 
                 this.$emit('cellClicked',date)
+            },
+            toBusinessHours(plages)
+            {
+                console.log("plages : "+JSON.stringify(plages));
+                const businessHours = {
+                    1:this.businessDay(0,plages),
+                    2:this.businessDay(1,plages),
+                    3:this.businessDay(2,plages),
+                    4:this.businessDay(3,plages),
+                    5:this.businessDay(4,plages),
+                    6:this.businessDay(5,plages),
+                    7:this.businessDay(6,plages),
+
+                }
+                return businessHours
+            },
+            businessDay(index,plages)
+            {
+                // console.log(index,plages);
+                
+                const plagesForDay = plages.filter((x)=>{
+                    return x.jour_semaine_id == index
+                })
+                const businessDay = []
+
+                for (let i = 0; i < plagesForDay.length; i++) {
+                    const plage = plagesForDay[i];
+                    const from = toMinutes(plage.heure_debut)
+                    const to = toMinutes(plage.heure_fin)
+                    businessDay.push({ from: from, to: to, class: 'business-hours' })
+                }
+
+                return businessDay
+                // const dayPlages = plages.
             }
         }
     }
 
-    // async function getMinAndMax(events)
-    // {
-    //     var settingsMin = await SettingsService.getSetting('heure_debut_calendrier')
-    //     var settingsMax = await SettingsService.getSetting('heure_fin_calendrier')
-
-    //     settingsMax = hourToMinutes(settingsMax)
-    //     settingsMin = hourToMinutes(settingsMin)
-    //     // console.log("sm : "+JSON.stringify(settingsMin));
-
-    //     var min = 60*24
-    //     var max = 0
-    //     // console.log("new value for events : "+newValue);
-    //     for (let i = 0; i < events.length; i++) {
-    //         const event = events[i];
-    //         if(!(event.start instanceof Date) || !(event.end instanceof Date))
-    //         {
-    //             continue
-    //         }
-    //         const startMin = event.start.getHours()*60+event.start.getMinutes()
-    //         const endMin = event.end.getHours()*60+event.end.getMinutes()
-    //         if(startMin<min)
-    //             min = startMin
-    //         if(endMin>max)
-    //             max = endMin
-    //     }
-    //     // console.log("min : "+min);
-        
-
-    //     min = Math.min(min,settingsMin)
-    //     max = Math.max(max,settingsMax)
-    //     return {min,max}
-    // }
-
-    // function hourToMinutes(hour)
-    // {
-    //     const [hours,minutes] = hour.split(":")
-
-    //     // console.log("h : "+hours+", m : "+minutes);
-        
-
-    //     return Number(hours)*60+Number(minutes)
-    // }
+    function toMinutes(time){
+        const [hours,minutes] = time.split(':')
+        return Number(hours)*60+Number(minutes)
+    }
 </script>

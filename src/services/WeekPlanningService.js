@@ -14,6 +14,18 @@ const WeekPlanningService = {
     }
   },
 
+  async getPlagesHorairesRaw(session) {
+    // console.log("session : "+session);
+    try {
+        const plages = await getPlagesHoraires(session);
+
+        return plages
+    } catch (error) {
+      console.error('WeekPlanningService Error:', error);
+      throw error; // Re-throw the error to handle it in the component
+    }
+  },
+
   async setPlagesHoraires(session,events){
     try{
         const plages = toPlages(events)

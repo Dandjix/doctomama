@@ -5,6 +5,7 @@
 
     :time-from="min"
     :time-to="max"
+    :special-hours="specialHours"
     ></vue-cal>
 </template>
 
@@ -18,6 +19,9 @@
             VueCal
         },
         data(){
+            const dailyHours = { from: 9 * 60, to: 18 * 60, class: 'business-hours' }
+
+
             return{
                 events:[
                 // {
@@ -35,19 +39,27 @@
                 },
                 ],
                 min:480,
-                max:1000
+                max:1000,
 
+                specialHours: {
+                    1: dailyHours,
+                    2: dailyHours,
+                    3: [
+                        { from: 9 * 60, to: 12 * 60, class: 'business-hours' },
+                        { from: 14 * 60, to: 18 * 60, class: 'business-hours' }
+                    ],
+                    4: dailyHours,
+                    5: dailyHours
+                }
             }
         }
     }
 </script>
 
 <style>
-    .colored{
-        background-color: aqua;
-        color: black;
-    }
-
-    .vuecal__event.leisure {background-color: rgba(253, 156, 66, 0.9);border: 1px solid rgb(233, 136, 46);color: #fff;}
-.vuecal__event.sport {background-color: rgba(255, 102, 102, 0.9);border: 1px solid rgb(235, 82, 82);color: #fff;}
+.business-hours {
+  background-color: rgba(255, 255, 0, 0.15);
+  border: solid rgba(255, 210, 0, 0.3);
+  border-width: 2px 0;
+}
 </style>
