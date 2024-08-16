@@ -168,7 +168,46 @@ import { mapState } from 'vuex';
             },
             eventDropped(event)
             {
+                this.applyBounds(event.event)
                 this.$emit('eventDropped',event)
+            },
+            applyBounds(event)
+            {
+                // console.log("event : "+JSON.stringify(event));
+                
+                const endMinutes = event.end.getHours()*60+event.end.getMinutes()
+                if(endMinutes>this.max_minutes)
+                {
+                    const duration = endMinutes - event.start.getHours()*60+event.start.getMinutes()
+                    const newStartMinutes = this.max_minutes-duration
+
+                    const minutesStart = newStartMinutes%60
+                    const hoursStart = Math.floor(newStartMinutes/60)
+
+                    const minutesEnd = this.max_minutes%60
+                    const hoursEnd = Math.floor(this.max_minutes/60)
+
+                    event.start.setHours(hoursStart,minutesStart,0,0)
+                    event.end.setHours(hoursEnd,minutesEnd,0,0)
+                }
+                else
+                {
+                    const startMinutes = event.start.getHours()*60 + event.start.getMinutes()
+                    if(startMinutes<this.min_minutes)
+                    {
+                        const duration = endMinutes - event.start.getHours()*60+event.start.getMinutes()
+                        const newEndMinutes = this.min_minutes+duration
+
+                        const minutesStart = this.min_minutes%60
+                        const hoursStart = Math.floor(this.min_minutes/60)
+
+                        const minutesEnd = newEndMinutes%60
+                        const hoursEnd = Math.floor(newEndMinutes/60)
+
+                        event.start.setHours(hoursStart,minutesStart,0,0)
+                        event.end.setHours(hoursEnd,minutesEnd,0,0)
+                    }
+                }
             },
             eventDeleted(event)
             {
@@ -199,7 +238,6 @@ import { mapState } from 'vuex';
                     5:this.businessDay(4,plages),
                     6:this.businessDay(5,plages),
                     7:this.businessDay(6,plages),
-
                 }
                 return businessHours
             },
