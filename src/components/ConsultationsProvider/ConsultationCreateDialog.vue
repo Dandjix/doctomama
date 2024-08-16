@@ -79,7 +79,7 @@
         watch:{
             startDate(newValue)
             {
-                console.log("setting start date : "+newValue);
+                // console.log("setting start date : "+newValue);
                 
                 this.dateConsultation = newValue
             },
