@@ -124,8 +124,16 @@
         watch:{
             maxHour()
             {
-                // console.log("max hour changed : "+this.maxHour);
-
+                this.checkUpperBound()
+            }
+        },
+        async mounted()
+        {
+            this.checkUpperBound()
+        },
+        methods:{
+            checkUpperBound()
+            {
                 const [hoursMax,minutesMax] = this.maxHour.split(':')
                 const maxMinutes = Number(hoursMax)*60+Number(minutesMax)
                 const currentMinutes = this.modelValue.getHours()*60+this.modelValue.getMinutes()
@@ -143,11 +151,7 @@
                     this.time = newTime
                     // this.$emit('update:modelValue',newTime)
                 }
-
-                
-            }
-        },
-        methods:{
+            },
             updateDate(newValue)
             {
                 // console.log("upd d");
