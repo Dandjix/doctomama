@@ -20,6 +20,23 @@ const dateUtils = {
     
         // return "Lundi 18 Janvier 2024 de 08:00 à 9:00"
     },
+    formatSpan(startTime,endTime){
+
+    
+        const start = new Date(startTime)
+        const end = new Date(endTime)
+        
+        const day = days[modulo(start.getDay()-1,7)]
+        const date = start.getDate()
+        const month = months[start.getMonth()]
+        const year = start.getFullYear()
+        const startHour = `${zeroPad(start.getHours())}:${zeroPad(start.getMinutes())}`
+        const endHour = `${zeroPad(end.getHours())}:${zeroPad(end.getMinutes())}`
+    
+        return `${day} ${date} ${month} ${year} de ${startHour} à ${endHour}`
+    
+        // return "Lundi 18 Janvier 2024 de 08:00 à 9:00"
+    },
 
     // formatDate(date){
 

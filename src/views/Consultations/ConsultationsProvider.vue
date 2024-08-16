@@ -30,7 +30,12 @@
     @create="createConsultation"
     ></ConsultationCreateDialog>
 
-    <ConsultationModifyOverlapDialog v-model="overlapDialog"></ConsultationModifyOverlapDialog>
+    <ConsultationOverlapDialog 
+    v-model="overlapDialog"
+    :consultations="overlapConsultations"
+    @revert="overlapDialog=false"
+    @commit="saveConsultations() ; overlapDialog=false"
+    ></ConsultationOverlapDialog>
 
     <v-row>
         <v-col cols="12" md="6">
@@ -65,9 +70,9 @@
     import ConsultationsService from '@/services/ConsultationsService';
     import consultationTypesService from '@/services/ConsultationTypesService';
     import { mapState } from 'vuex';
-    import ConsultationModifyOverlapDialog from '@/components/ConsultationsProvider/ConsultationModifyOverlapDialog.vue';
-import consultationsService from '@/services/ConsultationsService';
-import vacationsService from '@/services/VacationsService';
+    import ConsultationOverlapDialog from '@/components/ConsultationsProvider/ConsultationOverlapDialog.vue';
+    import consultationsService from '@/services/ConsultationsService';
+    import vacationsService from '@/services/VacationsService';
     // import consultationsService from '@/services/ConsultationsService';
 
     // import timeSlotsService from '@/services/TimeSlotsService';
@@ -80,7 +85,7 @@ import vacationsService from '@/services/VacationsService';
 
             ConsultationModifyDialog,
             ConsultationCreateDialog,
-            ConsultationModifyOverlapDialog
+            ConsultationOverlapDialog
         },
         data()
         {
@@ -101,6 +106,7 @@ import vacationsService from '@/services/VacationsService';
                 createDialog:false,
                 dateCreateDialog:null,
 
+                overlapConsultations:[],
                 overlapDialog:false,
 
             }
@@ -144,11 +150,54 @@ import vacationsService from '@/services/VacationsService';
                 // console.log("c : "+JSON.stringify(this.consultationsToCreate));
                 // console.log("d : "+JSON.stringify(this.consultationIdsToDelete));
                 // console.log("u : "+JSON.stringify(this.consultationsToUpdate));
+                const overlappingConsultations = this.getOverlappingConsultations()
+                overlappingConsultations.sort((a,b)=>{a.start.getTime()<b.start.getTime()})
 
+                if(overlappingConsultations.length==0)
+                {
+                    await this.saveConsultations()
+                }
+                else
+                {
+                    this.overlapConsultations = overlappingConsultations
+                    this.overlapDialog = true
+                }
+            },
+            async saveConsultations()
+            {
                 await consultationsService.updateConsultations(this.session,
                 this.consultationsToCreate, this.consultationIdsToDelete,this.consultationsToUpdate)
 
                 await this.reset()
+            },
+            getOverlappingConsultations()
+            {
+                const consultations = this.events.filter((x)=>{return x.eventType.startsWith("consultation")})
+
+                const overlappingConsultations = []
+
+                for (let i = 0; i < consultations.length; i++) {
+                    const consultation = consultations[i];
+                    for (let j = 0; j < consultations.length; j++) {
+                        if(i==j)
+                            continue
+                        const other = consultations[j];
+
+                        const startWithin = 
+                        consultation.start.getTime()>= other.start.getTime() 
+                        && consultation.start.getTime() < other.end.getTime()
+
+                        const endWithin = 
+                        consultation.end.getTime()> other.start.getTime() 
+                        && consultation.end.getTime() <= other.end.getTime()
+
+                        if(startWithin ||endWithin)
+                        {
+                            overlappingConsultations.push(consultation)
+                        }
+                    }
+                }
+                return overlappingConsultations
             },
             async consultationClicked(id)
             {
