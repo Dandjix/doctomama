@@ -121,6 +121,32 @@
             //     }
             // }
         },
+        watch:{
+            maxHour()
+            {
+                // console.log("max hour changed : "+this.maxHour);
+
+                const [hoursMax,minutesMax] = this.maxHour.split(':')
+                const maxMinutes = Number(hoursMax)*60+Number(minutesMax)
+                const currentMinutes = this.modelValue.getHours()*60+this.modelValue.getMinutes()
+
+                if(currentMinutes>maxMinutes)
+                {
+
+                    
+                    const newTime = new Date(this.time)
+                    newTime.setHours(hoursMax,minutesMax)
+
+                    // console.log("after : "+newTime);
+
+                    this.hour = `${hoursMax}:${minutesMax}`
+                    this.time = newTime
+                    // this.$emit('update:modelValue',newTime)
+                }
+
+                
+            }
+        },
         methods:{
             updateDate(newValue)
             {
