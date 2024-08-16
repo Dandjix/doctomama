@@ -55,13 +55,13 @@
 
                 <v-card-actions class="mr-10">
                     <v-row justify="end">
-                        <v-col cols="3">
+                        <v-col cols="12" md="3">
                             <v-btn @click="resetConsultation" color="yellow-darken-4" block>Réinitialiser</v-btn>
                         </v-col>
-                        <v-col cols="3">
+                        <v-col cols="12" md="3">
                             <v-btn @click="deleteConsultation" color="error" block>Supprimer</v-btn>
                         </v-col>
-                        <v-col cols="3">
+                        <v-col cols="12" md="3">
                             <v-btn color="primary" type="submit" block>Confirmer les modifications</v-btn>
                         </v-col>
                     </v-row>
