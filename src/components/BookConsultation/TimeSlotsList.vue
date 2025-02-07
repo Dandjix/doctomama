@@ -5,8 +5,8 @@
             <v-row>
                 <h3>{{formatDate(timeSlots.date)}}</h3>
             </v-row>
-            <v-row class="d-flex justify-space-between" v-if="timeSlots.timeSlots.length>0">
-                <TimeSlotItem 
+            <v-row class="d-flex justify-start" v-if="timeSlots.timeSlots.length>0">
+                <TimeSlotItem class="ml-3"
                 :start="timeSlot.start" 
                 :duration="duration" 
                 @book="book"
